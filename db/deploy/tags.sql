@@ -44,7 +44,7 @@ UPDATE
 SET
   updated_at = CURRENT_TIMESTAMP
 WHERE
-  id = NEW.id;
+  bill_iD = NEW.bill_iD AND tag_id = NEW.tag_id;
 
 END;
 
