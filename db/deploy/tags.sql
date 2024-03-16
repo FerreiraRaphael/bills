@@ -22,12 +22,12 @@ CREATE TABLE "bills_tags" (
   FOREIGN KEY (tag_id) REFERENCES tags (id)
 );
 
-CREATE TRIGGER updated_at_bills
+CREATE TRIGGER updated_at_tags
 AFTER
 UPDATE
-  ON bills FOR EACH ROW BEGIN
+  ON tags FOR EACH ROW BEGIN
 UPDATE
-  bills
+  tags
 SET
   updated_at = CURRENT_TIMESTAMP
 WHERE
@@ -35,12 +35,12 @@ WHERE
 
 END;
 
-CREATE TRIGGER updated_at_bills
+CREATE TRIGGER updated_at_bills_tags
 AFTER
 UPDATE
-  ON bills FOR EACH ROW BEGIN
+  ON bills_tags FOR EACH ROW BEGIN
 UPDATE
-  bills
+  bills_tags
 SET
   updated_at = CURRENT_TIMESTAMP
 WHERE
