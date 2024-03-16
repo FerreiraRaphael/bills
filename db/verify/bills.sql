@@ -1,7 +1,9 @@
 -- Verify bills:bills on sqlite
-
 BEGIN;
 
-DROP TABLE bills;
+SELECT
+  *
+FROM
+  "bills";
 
 ROLLBACK;

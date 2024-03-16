@@ -3,3 +3,4 @@
 %uri=https://github.com/sqitchers/sqitch-sqlite-intro/
 
 bills 2024-03-15T18:30:45Z Raphael Ferreira <raphaelbsferreira@gmail.com> # Creates table to track our bills.
+tags 2024-03-16T01:14:56Z Raphael Ferreira <raphaelbsferreira@gmail.com> # Creates table to track our tags.

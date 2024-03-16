@@ -11,3 +11,8 @@ alembic upgrade head
 uvicorn api.run:app --reload
 ```
 
+migrations
+
+```shell
+sqitch add bills -n 'Creates table to track our bills.'
+```
