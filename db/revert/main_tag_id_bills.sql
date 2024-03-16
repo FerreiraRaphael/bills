@@ -22,20 +22,6 @@ CREATE TABLE "bills" (
   PRIMARY KEY ("id" AUTOINCREMENT)
 );
 
--- INSERT INTO
---   bills (
---     SELECT
---       "id",
---       "name",
---       "value",
---       "date",
---       created_at,
---       updated_at,
---       deleted_at
---     FROM
---       bills_old
---   );
-
 INSERT INTO
   bills SELECT
       "id",
@@ -49,6 +35,9 @@ INSERT INTO
       bills_old;
 
 DROP TABLE "bills_old";
+
+ALTER TABLE bills RENAME to bills_old;
+ALTER TABLE bills_old RENAME to bills;
 
 COMMIT;
 

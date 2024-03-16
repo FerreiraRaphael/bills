@@ -12,14 +12,14 @@ CREATE TABLE "tags" (
 );
 
 CREATE TABLE "bills_tags" (
-  bill_iD INTEGER NOT NULL,
+  bill_id INTEGER NOT NULL,
   tag_id INTEGER NOT NULL,
   created_at Timestamp DEFAULT CURRENT_TIMESTAMP,
   updated_at Timestamp DEFAULT CURRENT_TIMESTAMP,
   deleted_at Timestamp,
   PRIMARY KEY ("bill_id", "tag_id"),
-  FOREIGN KEY (bill_id) REFERENCES bills (id),
-  FOREIGN KEY (tag_id) REFERENCES tags (id)
+  FOREIGN KEY (bill_id) REFERENCES bills(id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
 CREATE TRIGGER updated_at_tags
@@ -44,7 +44,8 @@ UPDATE
 SET
   updated_at = CURRENT_TIMESTAMP
 WHERE
-  bill_iD = NEW.bill_iD AND tag_id = NEW.tag_id;
+  bill_iD = NEW.bill_iD
+  AND tag_id = NEW.tag_id;
 
 END;
 

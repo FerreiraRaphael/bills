@@ -15,7 +15,7 @@ CREATE TABLE "bills" (
     AND strftime ('%Y-%m-%dT%H:%M:%SZ', "date") IS NOT NULL
     AND "date" IS NOT NULL
   ),
-  main_tag_id INTEGER,
+  "main_tag_id" INTEGER,
   created_at Timestamp DEFAULT CURRENT_TIMESTAMP,
   updated_at Timestamp DEFAULT CURRENT_TIMESTAMP,
   deleted_at Timestamp,
@@ -27,6 +27,9 @@ CREATE TABLE "bills" (
 INSERT INTO bills SELECT *, NULL as main_tag_id FROM bills_old;
 
 DROP TABLE "bills_old";
+
+ALTER TABLE bills RENAME to bills_old;
+ALTER TABLE bills_old RENAME to bills;
 
 COMMIT;
 
