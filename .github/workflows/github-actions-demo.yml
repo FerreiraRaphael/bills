@@ -5,8 +5,7 @@ jobs:
   Migrations:
     runs-on: ubuntu-latest
     - uses: actions/checkout@v4
-    - name: GOGO
-      uses: actions/sqitch
+    - uses: actions/sqitch
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
