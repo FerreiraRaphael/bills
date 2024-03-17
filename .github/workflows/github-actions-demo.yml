@@ -11,10 +11,8 @@ jobs:
           python_version=$(cat .python-version)
           echo "python_version=${python_version}" >> $GITHUB_ENV
           echo $GITHUB_ENV
-      - name: Set up Python ${{ $python-version }}
+      - name: Set up Python ${{ $(echo 'hey') }}
         uses: actions/setup-python@v4
-        with:
-          python-version: ${{ $python-version }}
       # You can test your matrix by printing the current Python version
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
