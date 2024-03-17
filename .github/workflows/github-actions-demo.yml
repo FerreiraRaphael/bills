@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Explore-Python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -10,9 +10,8 @@ jobs:
         run: |
           python_version=$(cat .python-version)
           echo "python_version=${python_version}" >> $GITHUB_ENV
-          echo $GITHUB_ENV
       - name: Set up Python
         uses: actions/setup-python@v4
       # You can test your matrix by printing the current Python version
       - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+        run: pip install -r requirements.txt
