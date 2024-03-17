@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 
 from collections import OrderedDict
 from collections.abc import Iterable
@@ -30,9 +29,7 @@ class SqlExtension(Extension):
         for token in tokens:
             if token.test("variable_begin"):
                 continue
-            elif token.test("name"):
-                name += token.value
-            elif token.test("dot"):
+            elif token.test("name") or token.test("dot"):
                 name += token.value
             else:
                 break
@@ -49,9 +46,10 @@ class SqlExtension(Extension):
 
         ... for all variable declarations in the template
 
-        Note the extra ( and ). We want the | bind to apply to the entire value, not just the last value.
-        The parentheses are mostly redundant, except in expressions like {{ '%' ~ myval ~ '%' }}
-
+        Note the extra ( and ). We want the | bind to apply to the entire value,
+        not just the last value.
+        The parentheses are mostly redundant, except in expressions like
+        {{ '%' ~ myval ~ '%' }}
         This function is called by jinja2 immediately
         after the lexing stage, but before the parser is called.
         """
@@ -121,7 +119,7 @@ def bind_in_clause(value):
 
 def _bind_param(already_bound, key, value):
     _thread_local.param_index += 1
-    new_key = "%s_%s" % (key, _thread_local.param_index)
+    new_key = f"{key}_{_thread_local.param_index}"
     already_bound[new_key] = value
 
     param_style = _thread_local.param_style
@@ -169,7 +167,7 @@ def is_dictionary(obj):
     return isinstance(obj, dict)
 
 
-class JinjaSql(object):
+class JinjaSql:
     # See PEP-249 for definition
     # qmark "where name = ?"
     # numeric "where name = :1"
