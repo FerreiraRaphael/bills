@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 import sqlite3
 import os
-from api.bills.model import Bill
 from api.bills._q.fetch_bills import fetch_bills
 
 def create_con(db_path: str, trace_callback = None):

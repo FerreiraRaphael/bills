@@ -61,8 +61,8 @@ UPDATE bills SET main_tag_id = 3 WHERE id=1;
     def test_output_no_join(self):
         bill_list = fetch_bills(self.con)
         assert len(bill_list) == 2
-        assert bill_list[0].tags == None
-        assert bill_list[1].tags == None
+        assert bill_list[0].tags is None
+        assert bill_list[1].tags is None
 
     def test_render_tags(self):
         assert render_cls_fields(Tag)("tag", "name") == "'name', tag.name"

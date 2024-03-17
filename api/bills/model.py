@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Union
+from typing import Optional
 from pydantic import BaseModel, validator
 from api.bills.tags.model import Tag
 from typing import TypeVar, Type

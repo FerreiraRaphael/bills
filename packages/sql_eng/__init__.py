@@ -67,7 +67,7 @@ class SqlExtension(Extension):
                 lineno = last_token.lineno
                 # don't bind twice
                 if (not last_token.test("name")
-                    or not last_token.value in ('bind', 'inclause', 'sqlsafe')):
+                    or last_token.value not in ('bind', 'inclause', 'sqlsafe')):
                     param_name = self.extract_param_name(var_expr)
 
                     var_expr.insert(1, Token(lineno, 'lparen', u'('))
@@ -168,7 +168,7 @@ class JinjaSql(object):
     def __init__(self, env=None, param_style='format', identifier_quote_character='"'):
         self.param_style = param_style
         if identifier_quote_character not in self.VALID_ID_QUOTE_CHARS:
-            raise ValueError("identifier_quote_characters must be one of " + VALID_ID_QUOTE_CHARS)
+            raise ValueError("identifier_quote_characters must be one of ")
         self.identifier_quote_character = identifier_quote_character
         self.env = env or Environment()
         self._prepare_environment()

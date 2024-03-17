@@ -1,5 +1,5 @@
 import os
-from typing import Union, Optional
+from typing import Optional
 from sqlite3 import Connection
 from jinja2 import Environment, FileSystemLoader
 from packages.sql_eng import JinjaSql
