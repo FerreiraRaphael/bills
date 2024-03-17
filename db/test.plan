@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=bills
+%uri=https://github.com/sqitchers/sqitch-sqlite-intro/
+
+bills 2024-03-15T18:30:45Z Raphael Ferreira <raphaelbsferreira@gmail.com> # Creates table to track our bills.
+tags 2024-03-16T01:14:56Z Raphael Ferreira <raphaelbsferreira@gmail.com> # Creates table to track our tags.
+main_tag_id_bills 2024-03-16T04:03:44Z Raphael Ferreira <raphaelbsferreira@gmail.com> # Add main tag foreign key to bills

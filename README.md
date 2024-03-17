@@ -16,3 +16,9 @@ migrations
 ```shell
 sqitch add bills -n 'Creates table to track our bills.'
 ```
+
+test
+
+```shell
+python -m unittest discover -p '*_test.py'
+```
