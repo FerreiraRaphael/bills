@@ -7,7 +7,6 @@ jobs:
     - uses: actions/checkout@v4
     - name: GOGO
       uses: actions/hello-world-docker-action@v2
-  who-to-greet: 'Mona the Octocat'
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
