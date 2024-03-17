@@ -20,5 +20,16 @@ sqitch add bills -n 'Creates table to track our bills.'
 test
 
 ```shell
-python -m unittest discover -p '*_test.py'
+pytest
+```
+
+linter
+```shell
+ruff check --fix --select 'I,E,F,UP,B,SIM'
+```
+
+format
+```shell
+ruff format --check
+ruff format
 ```
