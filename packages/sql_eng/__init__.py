@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
-from jinja2 import Environment
-from jinja2 import Template
-from jinja2 import FileSystemLoader
+
+from collections import OrderedDict
+from collections.abc import Iterable
+from random import Random
+from threading import local
+
+from jinja2 import Environment, FileSystemLoader, Template
 from jinja2.ext import Extension
 from jinja2.lexer import Token
 from markupsafe import Markup
-from collections.abc import Iterable
-from collections import OrderedDict
-from threading import local
-from random import Random
 
 _thread_local = local()
 
@@ -19,11 +19,12 @@ random = Random()
 class JinjaSqlException(Exception):
     pass
 
+
 class InvalidBindParameterException(JinjaSqlException):
     pass
 
-class SqlExtension(Extension):
 
+class SqlExtension(Extension):
     def extract_param_name(self, tokens):
         name = ""
         for token in tokens:
@@ -66,17 +67,20 @@ class SqlExtension(Extension):
                 last_token = var_expr[-1]
                 lineno = last_token.lineno
                 # don't bind twice
-                if (not last_token.test("name")
-                    or last_token.value not in ('bind', 'inclause', 'sqlsafe')):
+                if not last_token.test("name") or last_token.value not in (
+                    "bind",
+                    "inclause",
+                    "sqlsafe",
+                ):
                     param_name = self.extract_param_name(var_expr)
 
-                    var_expr.insert(1, Token(lineno, 'lparen', u'('))
-                    var_expr.append(Token(lineno, 'rparen', u')'))
-                    var_expr.append(Token(lineno, 'pipe', u'|'))
-                    var_expr.append(Token(lineno, 'name', u'bind'))
-                    var_expr.append(Token(lineno, 'lparen', u'('))
-                    var_expr.append(Token(lineno, 'string', param_name))
-                    var_expr.append(Token(lineno, 'rparen', u')'))
+                    var_expr.insert(1, Token(lineno, "lparen", "("))
+                    var_expr.append(Token(lineno, "rparen", ")"))
+                    var_expr.append(Token(lineno, "pipe", "|"))
+                    var_expr.append(Token(lineno, "name", "bind"))
+                    var_expr.append(Token(lineno, "lparen", "("))
+                    var_expr.append(Token(lineno, "string", param_name))
+                    var_expr.append(Token(lineno, "rparen", ")"))
 
                 var_expr.append(variable_end)
                 for token in var_expr:
@@ -84,10 +88,12 @@ class SqlExtension(Extension):
             else:
                 yield token
 
+
 def sql_safe(value):
     """Filter to mark the value of an expression as safe for inserting
     in a SQL statement"""
     return Markup(value)
+
 
 def bind(value, name):
     """A filter that prints %s, and stores the value
@@ -101,6 +107,7 @@ def bind(value, name):
     else:
         return _bind_param(_thread_local.bind_params, name, value)
 
+
 def bind_in_clause(value):
     values = list(value)
     results = []
@@ -111,49 +118,56 @@ def bind_in_clause(value):
     clause = "(" + clause + ")"
     return clause
 
+
 def _bind_param(already_bound, key, value):
     _thread_local.param_index += 1
     new_key = "%s_%s" % (key, _thread_local.param_index)
     already_bound[new_key] = value
 
     param_style = _thread_local.param_style
-    if param_style == 'qmark':
+    if param_style == "qmark":
         return "?"
-    elif param_style == 'format':
+    elif param_style == "format":
         return "%s"
-    elif param_style == 'numeric':
+    elif param_style == "numeric":
         return ":%s" % _thread_local.param_index
-    elif param_style == 'named':
+    elif param_style == "named":
         return ":%s" % new_key
-    elif param_style == 'pyformat':
+    elif param_style == "pyformat":
         return "%%(%s)s" % new_key
-    elif param_style == 'asyncpg':
+    elif param_style == "asyncpg":
         return "$%s" % _thread_local.param_index
     else:
         raise AssertionError("Invalid param_style - %s" % param_style)
+
 
 def build_escape_identifier_filter(identifier_quote_character):
     def quote_and_escape(value):
         # Escape double quote with 2 double quotes,
         # or escape backtick with 2 backticks
-        return identifier_quote_character + \
-                value.replace(identifier_quote_character, identifier_quote_character*2) + \
-                identifier_quote_character
+        return (
+            identifier_quote_character
+            + value.replace(identifier_quote_character, identifier_quote_character * 2)
+            + identifier_quote_character
+        )
 
     def identifier_filter(raw_identifier):
         if isinstance(raw_identifier, str):
-            raw_identifier = (raw_identifier, )
+            raw_identifier = (raw_identifier,)
         if not isinstance(raw_identifier, Iterable):
             raise ValueError("identifier filter expects a string or an Iterable")
-        return Markup('.'.join(quote_and_escape(s) for s in raw_identifier))
+        return Markup(".".join(quote_and_escape(s) for s in raw_identifier))
 
     return identifier_filter
+
 
 def requires_in_clause(obj):
     return isinstance(obj, (list, tuple))
 
+
 def is_dictionary(obj):
     return isinstance(obj, dict)
+
 
 class JinjaSql(object):
     # See PEP-249 for definition
@@ -163,9 +177,10 @@ class JinjaSql(object):
     # format "where name = %s"
     # pyformat "where name = %(name)s"
     # asyncpg "where name = $1"
-    VALID_PARAM_STYLES = ('qmark', 'numeric', 'named', 'format', 'pyformat', 'asyncpg')
-    VALID_ID_QUOTE_CHARS = ('`', '"')
-    def __init__(self, env=None, param_style='format', identifier_quote_character='"'):
+    VALID_PARAM_STYLES = ("qmark", "numeric", "named", "format", "pyformat", "asyncpg")
+    VALID_ID_QUOTE_CHARS = ("`", '"')
+
+    def __init__(self, env=None, param_style="format", identifier_quote_character='"'):
         self.param_style = param_style
         if identifier_quote_character not in self.VALID_ID_QUOTE_CHARS:
             raise ValueError("identifier_quote_characters must be one of ")
@@ -178,7 +193,9 @@ class JinjaSql(object):
         self.env.filters["bind"] = bind
         self.env.filters["sqlsafe"] = sql_safe
         self.env.filters["inclause"] = bind_in_clause
-        self.env.filters["identifier"] = build_escape_identifier_filter(self.identifier_quote_character)
+        self.env.filters["identifier"] = build_escape_identifier_filter(
+            self.identifier_quote_character
+        )
 
     def prepare_query(self, source, data):
         if isinstance(self.env.loader, FileSystemLoader):
@@ -197,9 +214,9 @@ class JinjaSql(object):
             _thread_local.param_index = 0
             query = template.render(data)
             bind_params = _thread_local.bind_params
-            if self.param_style in ('named', 'pyformat'):
+            if self.param_style in ("named", "pyformat"):
                 bind_params = dict(bind_params)
-            elif self.param_style in ('qmark', 'numeric', 'format', 'asyncpg'):
+            elif self.param_style in ("qmark", "numeric", "format", "asyncpg"):
                 bind_params = list(bind_params.values())
             return query, bind_params
         finally:

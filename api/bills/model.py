@@ -1,14 +1,15 @@
 import datetime
-from typing import Optional
-from pydantic import BaseModel, validator
-from api.bills.tags.model import Tag
-from typing import TypeVar, Type
 import json
+from typing import Optional, Type, TypeVar
 
-T = TypeVar('T', bound='Bill')
+from pydantic import BaseModel, validator
+
+from api.bills.tags.model import Tag
+
+T = TypeVar("T", bound="Bill")
+
 
 class Bill(BaseModel):
-
     id: Optional[int]
     name: str
     value: int
@@ -29,15 +30,12 @@ class Bill(BaseModel):
 
     @validator("tags", "main_tag", pre=True)
     @classmethod
-    def transform_tags(
-      cls,
-      raw: str | Tag | list[Tag] | None
-    ) -> Tag | list[Tag]:
+    def transform_tags(cls, raw: str | Tag | list[Tag] | None) -> Tag | list[Tag]:
         if not raw or isinstance(raw, (Tag, list)):
-          return raw
+            return raw
         value = json.loads(raw)
         if isinstance(value, list):
-          return [Tag.from_dict(row) for row in value]
+            return [Tag.from_dict(row) for row in value]
         return Tag.from_dict(value)
 
     @classmethod

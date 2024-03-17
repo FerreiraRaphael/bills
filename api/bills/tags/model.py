@@ -1,10 +1,12 @@
 import datetime
-from typing import Optional, TypeVar, Type
+from typing import Optional, Type, TypeVar
+
 from pydantic import BaseModel, validator
 
-T = TypeVar('T', bound='Tag')
-class Tag(BaseModel):
+T = TypeVar("T", bound="Tag")
 
+
+class Tag(BaseModel):
     id: Optional[int]
     name: str
     created_at: Optional[datetime.datetime] = datetime.datetime.now()
