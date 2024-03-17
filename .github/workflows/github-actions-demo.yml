@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: .github/actions/sqitch
+      - uses: .github/actions/sqitch/Dockerfile
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
