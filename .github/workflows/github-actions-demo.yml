@@ -6,11 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Migrate test
-        uses: ./.github/actions/sqitch
-        with:
-          command: deploy
-          target: test
+      - name: Run script file
+        run: |
+          chmod +x ./scripts/sqitch.sh
+          ./scripts/sqitch.sh
+        shell: bash
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
