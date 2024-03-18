@@ -8,8 +8,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run script file
         run: |
-          chmod +x ./scripts/sqitch.sh
-          ./scripts/sqitch.sh deploy test
+          chmod +x ./scripts/migrate.sh
+          ./scripts/migrate.sh deploy test
         shell: bash
       - uses: actions/upload-artifact@master
         with:
