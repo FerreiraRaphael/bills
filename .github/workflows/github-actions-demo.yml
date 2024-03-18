@@ -11,6 +11,10 @@ jobs:
           chmod +x ./scripts/sqitch.sh
           ./scripts/sqitch.sh deploy test
         shell: bash
+      - uses: actions/upload-artifact@master
+          with:
+            name: db-artifact
+            path: db
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
@@ -24,18 +28,18 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements.txt
   Testing:
-    needs: Setup-Python
+    needs: [Setup-Python, Migrations]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@master
+      - uses: actions/download-artifact@master
+        with:
+            name: db-artifact
+            path: db
       - uses: actions/setup-python@v4
         with:
           cache: 'pip'
       - run: pip install -r requirements.txt
-      # - name: Set up Python ${{ env.python_version }}
-      #   uses: actions/setup-python@v4
-      #   cache: 'pip'
-      # - run: pip install -r requirements.txt
       - name: Testing
         run: pytest
   Linter-and-format:
