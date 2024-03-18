@@ -12,9 +12,9 @@ jobs:
           ./scripts/sqitch.sh deploy test
         shell: bash
       - uses: actions/upload-artifact@master
-          with:
-            name: db-artifact
-            path: db
+        with:
+          name: db-artifact
+          path: db
   Setup-Python:
     runs-on: ubuntu-latest
     steps:
