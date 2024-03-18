@@ -9,7 +9,7 @@ jobs:
       - name: Run script file
         run: |
           chmod +x ./scripts/sqitch.sh
-          ./scripts/sqitch.sh
+          ./scripts/sqitch.sh deploy test
         shell: bash
   Setup-Python:
     runs-on: ubuntu-latest
@@ -19,9 +19,6 @@ jobs:
         run: |
           python_version=$(cat .python-version)
           echo "python_version=${python_version}" >> $GITHUB_ENV
-      # - name: Set up Python ${{ env.python_version }}
-      #   uses: actions/setup-python@v4
-      #   cache: 'pip'
       - uses: actions/setup-python@v4
         with:
           cache: 'pip'
