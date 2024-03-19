@@ -4,6 +4,7 @@ import sqlite3
 from fastapi import FastAPI, Request
 
 from api.bills._q.fetch_bills import fetch_bills
+from api.bills._m.insert_bill import insert_bill
 
 
 def create_con(db_path: str, trace_callback=None):

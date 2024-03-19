@@ -39,7 +39,9 @@ class TestStringMethods(unittest.TestCase):
         assert len(bill_list) == 3
         assert bill_list[0].name == "name"
         assert bill_list[1].name == "name2"
-        assert bill_list[2].name == "name3"
+
+        assert bill_list[1].value == 9999
+        assert bill_list[2].value == 9999
 
 if __name__ == "__main__":
     unittest.main()
