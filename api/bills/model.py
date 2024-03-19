@@ -15,8 +15,8 @@ class Bill(BaseModel):
     value: int
     date: Optional[datetime.datetime]
     main_tag_id: Optional[int]
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: Optional[datetime.datetime]
+    updated_at: Optional[datetime.datetime]
     deleted_at: Optional[datetime.datetime]
     tags: Optional[list[Tag]]
     main_tag: Optional[Tag]
