@@ -29,19 +29,38 @@ class TestStringMethods(unittest.TestCase):
         cls.con.rollback()
         cls.con.close()
 
-    def test_insert(self):
-
-        insert_bill(self.con, Bill(name='name', value='9999', date='2024-01-01T00:00:00Z'))
-        insert_bill(self.con, Bill(name='name2', value='9999', date='2024-01-01T00:00:00Z'))
-        insert_bill(self.con, Bill(name='name3', value='9999', date='2024-01-01T00:00:00Z'))
+    def test_insert_single(self):
+        insert_bill(self.con, Bill(name='single1', value='9999', date='2024-01-01T00:00:00Z'))
+        insert_bill(self.con, Bill(name='single2', value='9999', date='2024-01-01T00:00:00Z'))
+        insert_bill(self.con, Bill(name='single3', value='9999', date='2024-01-01T00:00:00Z'))
 
         bill_list = fetch_bills(self.con)
         assert len(bill_list) == 3
-        assert bill_list[0].name == "name"
-        assert bill_list[1].name == "name2"
-
+        assert bill_list[0].name == "single1"
+        assert bill_list[1].name == "single2"
         assert bill_list[1].value == 9999
         assert bill_list[2].value == 9999
+        assert bill_list[0].id == 1
+        assert bill_list[2].id == 3
+        self.con.execute("DELETE FROM bills WHERE id IS NOT NULL;")
+        self.con.execute ("DELETE FROM sqlite_sequence WHERE name='bills';")
+
+    def test_insert_multiple(self):  
+        bill1 = Bill(name='multi1', value='9999', date='2024-01-01T00:00:00Z')
+        bill2 = Bill(name='multi2', value='9999', date='2024-01-01T00:00:00Z')
+        bill3 = Bill(name='multi3', value='9999', date='2024-01-01T00:00:00Z')
+        insert_bill(self.con, bill1, bill2, bill3)
+
+        bill_list = fetch_bills(self.con)
+        assert len(bill_list) == 3
+        assert bill_list[0].name == "multi1"
+        assert bill_list[1].name == "multi2"
+        assert bill_list[1].value == 9999
+        assert bill_list[2].value == 9999
+        assert bill_list[0].id == 1
+        assert bill_list[2].id == 3
+        self.con.execute("DELETE FROM bills WHERE id IS NOT NULL;")
+        self.con.execute ("DELETE FROM sqlite_sequence WHERE name='bills';")
 
 if __name__ == "__main__":
     unittest.main()

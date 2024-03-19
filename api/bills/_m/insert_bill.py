@@ -16,9 +16,10 @@ env = Environment(loader=file_loader)
 sql_eng = JinjaSql(env=env, param_style="qmark")
 
 
-def insert_bill(con: Connection, bill: Bill):
-    name, value, date = bill.name, bill.value, bill.date
-    format = '%Y-%m-%dT%H:%M:%SZ'
-    con.execute(f"""INSERT INTO bills (name, value, date) 
-                VALUES ('{name}', '{value}', '{date.strftime(format)}')
-                """)
+def insert_bill(con: Connection, *args: Bill):
+    datetime_str_format = '%Y-%m-%dT%H:%M:%SZ'
+    for bill in args:
+        name, value, date = bill.name, bill.value, bill.date
+        con.execute(f"""INSERT INTO bills (name, value, date) 
+                    VALUES ('{name}', '{value}', '{date.strftime(datetime_str_format)}')
+                    """)
