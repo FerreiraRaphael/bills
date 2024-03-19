@@ -6,6 +6,7 @@ from pydantic.json import pydantic_encoder
 
 from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills, render_cls_fields
 from api.bills.tags.model import Tag
+from api.bills._m.insert_bill import insert_bill
 from api.bills.model import Bill
 from api.run import create_con
 
@@ -30,9 +31,9 @@ class TestStringMethods(unittest.TestCase):
 
     def test_insert(self):
 
-        insert_bill(Bill(name='name', value='9999',date='2024-01-01T00:00:00Z'))
-        insert_bill(Bill(name='name2', value='9999',date='2024-01-01T00:00:00Z'))
-        insert_bill(Bill(name='name3', value='9999',date='2024-01-01T00:00:00Z'))
+        insert_bill(self.con, Bill(name='name', value='9999', date='2024-01-01T00:00:00Z'))
+        insert_bill(self.con, Bill(name='name2', value='9999', date='2024-01-01T00:00:00Z'))
+        insert_bill(self.con, Bill(name='name3', value='9999', date='2024-01-01T00:00:00Z'))
 
         bill_list = fetch_bills(self.con)
         assert len(bill_list) == 3
@@ -42,3 +43,5 @@ class TestStringMethods(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+#ptw --runner "pytest -s"
