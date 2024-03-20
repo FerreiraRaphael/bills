@@ -33,3 +33,7 @@ def add_stuff(request: Request, call_next):
 @app.get("/")
 async def root(request: Request):
     return fetch_bills(con)
+
+@app.get("/ping")
+async def ping():
+    return "ping"
