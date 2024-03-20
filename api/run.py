@@ -19,7 +19,7 @@ def create_con(db_path: str, trace_callback=None):
     return con
 
 
-con = create_con("db/dev.sqlite")
+con = create_con("file::memory:?cache=shared")
 
 app = FastAPI()
 
