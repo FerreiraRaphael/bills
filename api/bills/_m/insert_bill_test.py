@@ -17,11 +17,7 @@ def print_beautiful(*values: object, model: BaseModel | list[BaseModel]) -> None
 class TestStringMethods(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.con = (
-            create_con("db/test.sqlite")
-            .executescript("BEGIN;")
-            .connection
-        )
+        cls.con = create_con("db/test.sqlite").executescript("BEGIN;").connection
 
     @classmethod
     def tearDownClass(cls):

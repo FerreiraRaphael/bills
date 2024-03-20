@@ -45,5 +45,3 @@ def insert_data(con: Connection, table: str, mapper, *args: BaseModel):
 
 def insert_bill(con: Connection, *args):
     insert_data(con, "bills", map_bill, *args)
-
-

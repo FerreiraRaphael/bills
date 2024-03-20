@@ -12,6 +12,7 @@ def create_con(db_path: str, trace_callback=None):
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
+
     sqlite3.paramstyle = "qmark"
     con = sqlite3.connect(os.path.abspath(db_path))
     con.row_factory = dict_factory
