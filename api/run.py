@@ -13,7 +13,7 @@ def create_con(db_path: str, trace_callback=None):
             d[col[0]] = row[idx]
         return d
     sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect(os.path.abspath(db_path))
+    con = sqlite3.connect("file::memory:?cache=shared")
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
