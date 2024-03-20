@@ -36,4 +36,4 @@ async def root(request: Request):
 
 @app.get("/ping")
 async def ping():
-    return "ping"
+    return "pingg"
