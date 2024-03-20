@@ -10,6 +10,7 @@ T = TypeVar("T", bound="Bill")
 
 
 class Bill(BaseModel):
+    __join_fields__ = ("tags", "main_tag")
     id: Optional[int]
     name: str
     value: int
