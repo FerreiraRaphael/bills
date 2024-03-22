@@ -16,7 +16,7 @@ def create_con(db_path: str, trace_callback=None):
         return d
 
     sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect(os.path.abspath(db_path))
+    con = sqlite3.connect("db/dev.sqlite")
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
@@ -41,3 +41,9 @@ async def root(request: Request):
 @app.post("/add_bills/")
 async def add_new_bill(request: Request, *args: Bill):
     return insert_bill(con, *args)
+
+
+@app.get("/ping")
+async def ping():
+    return "pingg"
+

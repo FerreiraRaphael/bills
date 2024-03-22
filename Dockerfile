@@ -46,4 +46,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD scripts/dev.sh
+CMD ["python", "-m", "uvicorn", "api.run:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
