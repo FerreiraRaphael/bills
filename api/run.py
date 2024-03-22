@@ -3,7 +3,9 @@ import sqlite3
 
 from fastapi import FastAPI, Request
 
+from api.bills.model import Bill
 from api.bills._q.fetch_bills import fetch_bills
+from api.bills._m.insert_bill import insert_bill
 
 
 def create_con(db_path: str, trace_callback=None):
@@ -34,3 +36,7 @@ def add_stuff(request: Request, call_next):
 @app.get("/")
 async def root(request: Request):
     return fetch_bills(con)
+
+@app.post("/add_bills/")
+async def add_new_bill(request: Request, *args: Bill):
+    return insert_bill(con, *args)
