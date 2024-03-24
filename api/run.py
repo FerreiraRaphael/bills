@@ -1,8 +1,11 @@
 import os
 import sqlite3
+import functools
+import yaml
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 
+from io import StringIO
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
@@ -38,12 +41,20 @@ async def root(request: Request):
     return fetch_bills(con)
 
 
-@app.post("/add_bills/")
-async def add_new_bill(request: Request, *args: Bill):
-    return insert_bill(con, *args)
+@app.post("/add_bills")
+async def add_new_bill(request: Request, bills: list[Bill]):
+    return insert_bill(con, *bills)
 
 
 @app.get("/ping")
 async def ping():
     return "pingg"
 
+
+@app.get("/openapi.yaml", include_in_schema=False)
+@functools.lru_cache()
+def read_openapi_yaml() -> Response:
+    openapi_json = app.openapi()
+    yaml_s = StringIO()
+    yaml.dump(openapi_json, yaml_s)
+    return Response(yaml_s.getvalue(), media_type="text/yaml")

@@ -34,7 +34,7 @@ def treat_data(mapper, *args: BaseModel):
 
 def insert_data(con: Connection, table: str, mapper, *args: BaseModel):
     sql_columns, params_string, model_objects_values = treat_data(mapper, *args)
-    con.execute(
+    return con.execute(
         f"""
                 INSERT INTO {table} ({", ".join(sql_columns)})
                 VALUES {", ".join(params_string)}
@@ -44,4 +44,4 @@ def insert_data(con: Connection, table: str, mapper, *args: BaseModel):
 
 
 def insert_bill(con: Connection, *args):
-    insert_data(con, "bills", map_bill, *args)
+    return insert_data(con, "bills", map_bill, *args)
