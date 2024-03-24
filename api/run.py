@@ -16,7 +16,7 @@ def create_con(db_path: str, trace_callback=None):
         return d
 
     sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect("db/dev.sqlite")
+    con = sqlite3.connect(db_path)
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
