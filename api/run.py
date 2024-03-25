@@ -1,11 +1,10 @@
-import os
-import sqlite3
 import functools
-import yaml
+import sqlite3
+from io import StringIO
 
+import yaml
 from fastapi import FastAPI, Request, Response
 
-from io import StringIO
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
@@ -52,7 +51,7 @@ async def ping():
 
 
 @app.get("/openapi.yaml", include_in_schema=False)
-@functools.lru_cache()
+@functools.lru_cache
 def read_openapi_yaml() -> Response:
     openapi_json = app.openapi()
     yaml_s = StringIO()
