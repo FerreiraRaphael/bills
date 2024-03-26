@@ -2,23 +2,14 @@
 
 ### migrate
 ```shell
-alembic revision --autogenerate -m "Create a baseline migrations"
-```
-```shell
-alembic upgrade head
-```
-```shell
-uvicorn api.run:app --reload
+./scripts/migrate.sh deploy
 ```
 
-migrations
-
 ```shell
-sqitch add bills -n 'Creates table to track our bills.'
+./scripts/migrate.sh add bills -n 'Creates table to track our bills.'
 ```
 
 test
-
 ```shell
 pytest
 ```

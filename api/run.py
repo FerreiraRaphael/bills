@@ -12,15 +12,14 @@ def create_con(db_path: str, trace_callback=None):
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
-
     sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect(os.path.abspath(db_path))
+    con = sqlite3.connect("file::memory:?cache=shared")
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
 
 
-con = create_con("db/dev.sqlite")
+con = create_con("file::memory:?cache=shared")
 
 app = FastAPI()
 
@@ -34,3 +33,7 @@ def add_stuff(request: Request, call_next):
 @app.get("/")
 async def root(request: Request):
     return fetch_bills(con)
+
+@app.get("/ping")
+async def ping():
+    return "pingg"
