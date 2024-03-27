@@ -51,4 +51,6 @@ docs/_build/
 *.sqlite
 *.sqlite-journal
 
+
+# Venv files
 .venv
