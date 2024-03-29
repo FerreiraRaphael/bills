@@ -1,5 +1,5 @@
 name: Bills Checks
-run-name: ${{ github.event.pull_request.title }} /#${{ github.event.pull_request.number }} 🚀
+run-name: Checking ${{ github.event.pull_request.title }} 🚀
 on: [pull_request]
 jobs:
   Migrations:
