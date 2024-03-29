@@ -1,5 +1,37 @@
--- Deploy bills:tags to sqlite
+-- Deploy bills:bills to sqlite
 BEGIN;
+
+DROP TABLE IF EXISTS bills;
+CREATE TABLE "bills" (
+  "id" INTEGER,
+  "name" TEXT NOT NULL,
+  "value" INTEGER NOT NULL,
+  "date" DATETIME CONSTRAINT datetime_chk CHECK (
+    "date" == strftime ('%Y-%m-%dT%H:%M:%SZ', "date")
+    AND strftime ('%Y-%m-%dT%H:%M:%SZ', "date") IS NOT NULL
+    AND "date" IS NOT NULL
+  ),
+  "main_tag_id" INTEGER,
+  created_at Timestamp DEFAULT CURRENT_TIMESTAMP,
+  updated_at Timestamp DEFAULT CURRENT_TIMESTAMP,
+  deleted_at Timestamp,
+  UNIQUE ("name", "value", "date"),
+  PRIMARY KEY ("id" AUTOINCREMENT),
+  FOREIGN KEY (main_tag_id) REFERENCES tags(id)
+);
+
+DROP TRIGGER IF EXISTS updated_at_bills;
+CREATE TRIGGER updated_at_bills
+AFTER
+UPDATE
+  ON bills FOR EACH ROW BEGIN
+UPDATE
+  bills
+SET
+  updated_at = CURRENT_TIMESTAMP
+WHERE
+  id = NEW.id;
+END;
 
 CREATE TABLE "tags" (
   "id" INTEGER,

@@ -1,0 +1,56 @@
+name: Bills Checks
+run-name: Checking ${{ github.event.pull_request.title }} 🚀
+on: [pull_request]
+jobs:
+  Migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ariga/setup-atlas@v0
+      - name: Run migration
+        run: atlas migrate apply --env test
+      - uses: actions/upload-artifact@master
+        with:
+          name: db-artifact
+          path: db
+  Setup-Python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Python version
+        run: |
+          python_version=$(cat .python-version)
+          echo "python_version=${python_version}" >> $GITHUB_ENV
+      - uses: actions/setup-python@v5
+        with:
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+  Testing:
+    needs: [Setup-Python, Migrations]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/download-artifact@master
+        with:
+            name: db-artifact
+            path: db
+      - uses: actions/setup-python@v5
+        with:
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Testing
+        run: pytest
+  Linter-and-format:
+    needs: Setup-Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Lint and Format check
+        run: |
+          chmod +x ./scripts/lint_format.sh
+          ./scripts/lint_format.sh
+        shell: bash

@@ -2,23 +2,20 @@
 
 ### migrate
 ```shell
-alembic revision --autogenerate -m "Create a baseline migrations"
-```
-```shell
-alembic upgrade head
-```
-```shell
-uvicorn api.run:app --reload
+atlas migrate apply --env test
+atlas migrate apply --env local
 ```
 
-migrations
-
 ```shell
-sqitch add bills -n 'Creates table to track our bills.'
+atlas migrate diff migration_name \
+  --to file://db/schema.sql \
+  --dev-url "sqlite://dev?mode=memory" \
+  --format '{{ sql . "  " }}'
+
+atlas migrate down --env local  --dev-url "sqlite://dev?mode=memory"
 ```
 
 test
-
 ```shell
 pytest
 ```

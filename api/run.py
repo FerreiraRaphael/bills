@@ -1,4 +1,3 @@
-import os
 import sqlite3
 
 from fastapi import FastAPI, Request
@@ -14,7 +13,7 @@ def create_con(db_path: str, trace_callback=None):
         return d
 
     sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect(os.path.abspath(db_path))
+    con = sqlite3.connect(db_path)
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
@@ -34,3 +33,8 @@ def add_stuff(request: Request, call_next):
 @app.get("/")
 async def root(request: Request):
     return fetch_bills(con)
+
+
+@app.get("/ping")
+async def ping():
+    return "pingg"
