@@ -1,6 +1,6 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+name: Bills Checks
+run-name: ${{ github.event.pull_request.title }} //#${{ github.event.pull_request.number }} 🚀
+on: [pull_request]
 jobs:
   Migrations:
     runs-on: ubuntu-latest

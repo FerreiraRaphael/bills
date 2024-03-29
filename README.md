@@ -2,11 +2,17 @@
 
 ### migrate
 ```shell
-./scripts/migrate.sh deploy
+atlas migrate apply --env test
+atlas migrate apply --env local
 ```
 
 ```shell
-./scripts/migrate.sh add bills -n 'Creates table to track our bills.'
+atlas migrate diff migration_name \
+  --to file://db/schema.sql \
+  --dev-url "sqlite://dev?mode=memory" \
+  --format '{{ sql . "  " }}'
+
+atlas migrate down --env local  --dev-url "sqlite://dev?mode=memory"
 ```
 
 test
