@@ -1,8 +1,9 @@
 import unittest
 
 from api.bills._m.insert_bill import insert_bill
+from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
 from api.bills.model import Bill
-from api.bills.tags._m.insert_bills_tags import insert_bills_tags
+from api.bills.tags._m.insert_bills_tags import InsertBillsTagsInput, insert_bills_tags
 from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags.model import Tag
 from api.run import create_con
@@ -26,20 +27,18 @@ class TestStringMethods(unittest.TestCase):
         tag3 = Tag(id=3, name="tag3")
         insert_bill(self.con, bill1)
         insert_tag(self.con, tag1, tag2, tag3)
-        insert_bills_tags(self.con, 1, 1, 2, 3)
-        bills_tags_list = self.con.execute(
-            """SELECT bill_id, tag_id FROM bills_tags"""
-        ).fetchall()
-        assert len(bills_tags_list) == 3
-        assert bills_tags_list[0] == {"bill_id": 1, "tag_id": 1}
-        assert bills_tags_list[1] == {"bill_id": 1, "tag_id": 2}
-        assert bills_tags_list[2] == {"bill_id": 1, "tag_id": 3}
-        self.con.execute("DELETE FROM bills WHERE id IS NOT NULL;")
-        self.con.execute("DELETE FROM tags WHERE id IS NOT NULL;")
-        self.con.execute("DELETE FROM bills_tags WHERE bill_id IS NOT NULL;")
-        self.con.execute("DELETE FROM sqlite_sequence WHERE name='bills';")
-        self.con.execute("DELETE FROM sqlite_sequence WHERE name='tags';")
-        self.con.execute("DELETE FROM sqlite_sequence WHERE name='bills_tags';")
+        insert_bills_tags(
+            self.con,
+            InsertBillsTagsInput(bill_id=1, tag_id=1),
+            InsertBillsTagsInput(bill_id=1, tag_id=2),
+            InsertBillsTagsInput(bill_id=1, tag_id=3),
+        )
+        bill_list = fetch_bills(self.con, FetchBillsParams(join_tags=True))
+        assert len(bill_list) == 1
+        assert len(bill_list[0].tags) == 3
+        assert bill_list[0].tags[0].name == "tag1"
+        assert bill_list[0].tags[1].name == "tag2"
+        assert bill_list[0].tags[2].name == "tag3"
 
 
 if __name__ == "__main__":

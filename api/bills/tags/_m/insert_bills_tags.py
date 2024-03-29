@@ -1,28 +1,18 @@
 from sqlite3 import Connection
 
+from pydantic import BaseModel
 
-def fetch_id(con: Connection, table: str, *sql_columns: str):
-    placeholders = ", ".join(["?"] * len(sql_columns))
-    cursor = con.cursor()
-    cursor.execute(
-        f"""SELECT id FROM {table} WHERE name IN ({placeholders});""", sql_columns
-    )
-    id_values = cursor.fetchall()
-    cursor.close()
-    return id_values
+from api.bills._m.insert_data import insert_data
 
 
-def insert_bills_tags(con: Connection, bill_id: int, *tags_id: int):
-    params_string = [", ".join(["(?, ?)" for _ in tags_id])]
-    values_list = []
-    for tag_id in tags_id:
-        values_list.append(bill_id)
-        values_list.append(tag_id)
+class InsertBillsTagsInput(BaseModel):
+    bill_id: int
+    tag_id: int
 
-    return con.execute(
-        f"""
-                INSERT INTO bills_tags (bill_id, tag_id)
-                VALUES{", ".join(params_string)}
-                """,
-        tuple(values_list),
-    )
+
+def map_bills_tags(insert_bills_tags: InsertBillsTagsInput):
+    return insert_bills_tags.dict()
+
+
+def insert_bills_tags(con: Connection, *bills_tags_ids: InsertBillsTagsInput):
+    return insert_data(con, "bills_tags", map_bills_tags, *bills_tags_ids)
