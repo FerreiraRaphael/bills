@@ -44,7 +44,6 @@ async def root(request: Request):
 async def add_new_bill(request: Request, bills: list[Bill]):
     return insert_bill(con, *bills)
 
-
 @app.get("/ping")
 async def ping():
     return "pingg"
