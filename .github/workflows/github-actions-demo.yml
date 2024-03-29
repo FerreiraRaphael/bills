@@ -6,11 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run script file
-        run: |
-          chmod +x ./scripts/migrate.sh
-          ./scripts/migrate.sh deploy test
-        shell: bash
+      - uses: ariga/setup-atlas@v0
+      - name: Run migration
+        run: atlas migrate apply --env test
       - uses: actions/upload-artifact@master
         with:
           name: db-artifact
