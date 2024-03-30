@@ -9,7 +9,4 @@ class UpdateBillsInput(BaseModel):
 
 
 def update_main_tag(con: Connection, main_tag_id: int, bill_id: int):
-    con.execute(
-        'UPDATE bills SET main_tag_id = ? WHERE id = ?',
-        [main_tag_id, bill_id]
-    )
+    con.execute("UPDATE bills SET main_tag_id = ? WHERE id = ?", [main_tag_id, bill_id])

@@ -11,7 +11,7 @@ T = TypeVar("T", bound="Bill")
 
 
 class Bill(TableModel):
-    __table_name__ = 'bills'
+    __table_name__ = "bills"
     __join_fields__ = ("tags", "main_tag")
     id: Optional[int]
     name: str

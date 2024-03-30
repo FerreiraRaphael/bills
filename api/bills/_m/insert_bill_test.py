@@ -1,37 +1,34 @@
 import unittest
 
+from libsql_client import dbapi2
+
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
-from libsql_client import dbapi2
+
+
 class TestStringMethods(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.con.rollback()
 
     def test_insert_single(self):
-      self.con: dbapi2.ConnectionTypes = self.con
-      with self.con as con:
-          date_sample = "2024-01-01T00:00:00Z"
-          insert_bill(
-              con, Bill(id=1, name="single1", value="9999", date=date_sample)
-          )
-          insert_bill(
-              con, Bill(id=2, name="single2", value="9999", date=date_sample)
-          )
-          insert_bill(
-              con, Bill(id=3, name="single3", value="9999", date=date_sample)
-          )
+        self.con: dbapi2.ConnectionTypes = self.con
+        with self.con as con:
+            date_sample = "2024-01-01T00:00:00Z"
+            insert_bill(con, Bill(id=1, name="single1", value="9999", date=date_sample))
+            insert_bill(con, Bill(id=2, name="single2", value="9999", date=date_sample))
+            insert_bill(con, Bill(id=3, name="single3", value="9999", date=date_sample))
 
-          bill_list = fetch_bills(con)
-          assert len(bill_list) == 3
-          assert bill_list[0].name == "single1"
-          assert bill_list[1].name == "single2"
-          assert bill_list[1].value == 9999
-          assert bill_list[2].value == 9999
-          assert bill_list[0].id == 1
-          assert bill_list[2].id == 3
-          con.rollback()
+            bill_list = fetch_bills(con)
+            assert len(bill_list) == 3
+            assert bill_list[0].name == "single1"
+            assert bill_list[1].name == "single2"
+            assert bill_list[1].value == 9999
+            assert bill_list[2].value == 9999
+            assert bill_list[0].id == 1
+            assert bill_list[2].id == 3
+            con.rollback()
 
     def test_insert_multiple(self):
         self.con: dbapi2.ConnectionTypes = self.con
@@ -79,6 +76,7 @@ class TestStringMethods(unittest.TestCase):
             assert res1.updated_at is not None
             assert res1.deleted_at is None
             con.rollback()
+
 
 if __name__ == "__main__":
     unittest.main()

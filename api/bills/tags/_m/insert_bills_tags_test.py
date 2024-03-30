@@ -6,11 +6,9 @@ from api.bills.model import Bill
 from api.bills.tags._m.insert_bills_tags import insert_bills_tags
 from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags.model import BillTag, Tag
-from api.run import create_con
 
 
 class TestStringMethods(unittest.TestCase):
-
     @classmethod
     def tearDownClass(cls):
         cls.con.rollback()

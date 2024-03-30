@@ -3,11 +3,11 @@ from io import StringIO
 
 import yaml
 from fastapi import FastAPI, Request, Response
+from libsql_client import dbapi2
 
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
-from libsql_client import dbapi2
 
 
 def create_con(db_path: str, trace_callback=None):
@@ -46,6 +46,7 @@ async def root(request: Request):
 @app.post("/add_bills")
 async def add_new_bill(request: Request, bills: list[Bill]):
     return insert_bill(con, *bills)
+
 
 @app.get("/ping")
 async def ping():

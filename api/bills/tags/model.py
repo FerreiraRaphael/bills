@@ -9,7 +9,7 @@ T = TypeVar("T", bound="Tag")
 
 
 class Tag(TableModel):
-    __table_name__ = 'tags'
+    __table_name__ = "tags"
     id: Optional[int]
     name: str
     created_at: Optional[datetime.datetime] = datetime.datetime.now()
@@ -29,6 +29,6 @@ class Tag(TableModel):
 
 
 class BillTag(TableModel):
-  __table_name__ = 'bills_tags'
-  bill_id: int
-  tag_id: int
+    __table_name__ = "bills_tags"
+    bill_id: int
+    tag_id: int

@@ -5,6 +5,7 @@ from pydash import omit
 from api._m.insert_data import insert_data
 from api.bills.model import Bill
 
+
 def map_bill(bill: Bill):
     dict = bill.dict()
     datetime_str_format = "%Y-%m-%dT%H:%M:%SZ"

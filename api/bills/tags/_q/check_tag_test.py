@@ -1,9 +1,10 @@
 import unittest
+from sqlite3 import Connection
 
 from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags._q.check_tag import check_tag
 from api.bills.tags.model import Tag
-from sqlite3 import Connection
+
 
 class TestStringMethods(unittest.TestCase):
     @classmethod
@@ -20,6 +21,7 @@ class TestStringMethods(unittest.TestCase):
         assert check_tag(self.con, "tag2")
         assert not check_tag(self.con, "tag3")
         assert not check_tag(self.con, "tag4")
+
 
 if __name__ == "__main__":
     unittest.main()
