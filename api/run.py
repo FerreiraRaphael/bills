@@ -1,5 +1,4 @@
 import functools
-import sqlite3
 from io import StringIO
 
 import yaml
@@ -8,6 +7,7 @@ from fastapi import FastAPI, Request, Response
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
+from libsql_client import dbapi2
 
 
 def create_con(db_path: str, trace_callback=None):
@@ -17,14 +17,17 @@ def create_con(db_path: str, trace_callback=None):
             d[col[0]] = row[idx]
         return d
 
-    sqlite3.paramstyle = "qmark"
-    con = sqlite3.connect(db_path)
+    con = dbapi2.connect(
+        db_path,
+        uri=True,
+        detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
+    )
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
 
 
-con = create_con("db/dev.sqlite")
+con = create_con("file:db/dev.sqlite")
 
 app = FastAPI()
 

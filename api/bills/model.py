@@ -2,14 +2,16 @@ import datetime
 import json
 from typing import Optional, Type, TypeVar
 
-from pydantic import BaseModel, validator
+from pydantic import validator
 
 from api.bills.tags.model import Tag
+from api.models import TableModel
 
 T = TypeVar("T", bound="Bill")
 
 
-class Bill(BaseModel):
+class Bill(TableModel):
+    __table_name__ = 'bills'
     __join_fields__ = ("tags", "main_tag")
     id: Optional[int]
     name: str

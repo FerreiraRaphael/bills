@@ -2,9 +2,8 @@ from sqlite3 import Connection
 
 from pydash import omit
 
-from api.bills._m.insert_data import insert_data
+from api._m.insert_data import insert_data
 from api.bills.model import Bill
-
 
 def map_bill(bill: Bill):
     dict = bill.dict()
@@ -14,4 +13,4 @@ def map_bill(bill: Bill):
 
 
 def insert_bill(con: Connection, *args: Bill):
-    return insert_data(con, "bills", map_bill, *args)
+    return insert_data(con, Bill, map_bill, *args)

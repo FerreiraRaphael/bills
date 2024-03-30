@@ -3,21 +3,17 @@ import unittest
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
 from api.bills.model import Bill
-from api.bills.tags._m.insert_bills_tags import InsertBillsTagsInput, insert_bills_tags
+from api.bills.tags._m.insert_bills_tags import insert_bills_tags
 from api.bills.tags._m.insert_tag import insert_tag
-from api.bills.tags.model import Tag
+from api.bills.tags.model import BillTag, Tag
 from api.run import create_con
 
 
 class TestStringMethods(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.con = create_con("db/test.sqlite").executescript("BEGIN;").connection
 
     @classmethod
     def tearDownClass(cls):
         cls.con.rollback()
-        cls.con.close()
 
     def test_insert_bills_tags(self):
         date_sample = "2024-01-01T00:00:00Z"
@@ -29,9 +25,9 @@ class TestStringMethods(unittest.TestCase):
         insert_tag(self.con, tag1, tag2, tag3)
         insert_bills_tags(
             self.con,
-            InsertBillsTagsInput(bill_id=1, tag_id=1),
-            InsertBillsTagsInput(bill_id=1, tag_id=2),
-            InsertBillsTagsInput(bill_id=1, tag_id=3),
+            BillTag(bill_id=1, tag_id=1),
+            BillTag(bill_id=1, tag_id=2),
+            BillTag(bill_id=1, tag_id=3),
         )
         bill_list = fetch_bills(self.con, FetchBillsParams(join_tags=True))
         assert len(bill_list) == 1
