@@ -1,17 +1,18 @@
-from os import path
+import pytest_asyncio
+from libsql_client import Client
 
-import pytest
-
-from api.run import create_con
+from api.run import create_client
 
 
-@pytest.fixture(scope="class", autouse=True)
-def setup_con(request):
-    con = create_con("file:db/test.sqlite")
-    script_dir = path.dirname(path.abspath(__file__))
-    sql_path = path.join(script_dir, "../db/clean_db.sql")
-    with open(sql_path) as sql:
-        con.executescript(sql.read())
-    request.cls.con = con
-    yield con
-    con.close()
+@pytest_asyncio.fixture(scope="session")
+async def setup_client():
+    async with create_client("file:db/test.sqlite") as client:
+        yield client
+        await client.close()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def t(setup_client: Client):
+    t = setup_client.transaction()
+    yield t
+    await t.rollback()

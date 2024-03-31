@@ -1,9 +1,10 @@
 import functools
 from io import StringIO
 
+import aiosqlite
 import yaml
 from fastapi import FastAPI, Request, Response
-from libsql_client import dbapi2
+from libsql_client import create_client, dbapi2
 
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
@@ -11,6 +12,8 @@ from api.bills.model import Bill
 
 
 def create_con(db_path: str, trace_callback=None):
+    print("help", aiosqlite)
+
     def dict_factory(cursor, row):
         d = {}
         for idx, col in enumerate(cursor.description):
@@ -25,6 +28,32 @@ def create_con(db_path: str, trace_callback=None):
     con.row_factory = dict_factory
     con.set_trace_callback(trace_callback)
     return con
+
+
+async def async_create_con(db_path: str, trace_callback=None):
+    def dict_factory(cursor, row):
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d
+
+    con = await aiosqlite.connect(
+        db_path,
+        uri=True,
+        detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
+    )
+    con.row_factory = dict_factory
+    await con.set_trace_callback(trace_callback)
+    return con
+    # con = await aiosqlite.connect(
+    #     db_path,
+    #     uri=True,
+    #     detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
+    # )
+
+
+def async_create_db_client(db_path: str):
+    return create_client(db_path)
 
 
 con = create_con("file:db/dev.sqlite")

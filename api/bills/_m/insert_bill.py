@@ -1,5 +1,4 @@
-from sqlite3 import Connection
-
+from libsql_client import Transaction
 from pydash import omit
 
 from api._m.insert_data import insert_data
@@ -13,5 +12,5 @@ def map_bill(bill: Bill):
     return omit(dict, *Bill.__join_fields__)
 
 
-def insert_bill(con: Connection, *args: Bill):
-    return insert_data(con, Bill, map_bill, *args)
+async def insert_bill(t: Transaction, *args: Bill):
+    return await insert_data(t, Bill, map_bill, *args)

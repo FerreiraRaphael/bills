@@ -1,7 +1,6 @@
-from sqlite3 import Connection
+from libsql_client import Transaction
 
 
-def check_tag(con: Connection, name: str):
-    cursor = con.cursor()
-    cursor.execute("SELECT * FROM tags WHERE name = ?;", [name])
-    return cursor.fetchone() is not None
+async def check_tag(t: Transaction, name: str):
+    res = await t.execute("SELECT * FROM tags WHERE name = ?;", [name])
+    return len(res.rows) != 0

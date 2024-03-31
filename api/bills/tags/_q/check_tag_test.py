@@ -1,27 +1,21 @@
-import unittest
-from sqlite3 import Connection
+import pytest_asyncio
+from libsql_client import Client, Transaction
 
 from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags._q.check_tag import check_tag
 from api.bills.tags.model import Tag
 
 
-class TestStringMethods(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.con: Connection = cls.con
-        insert_tag(cls.con, Tag(name="tag1"), Tag(name="tag2"))
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.con.rollback()
-
-    def test_check_tag(self):
-        assert check_tag(self.con, "tag1")
-        assert check_tag(self.con, "tag2")
-        assert not check_tag(self.con, "tag3")
-        assert not check_tag(self.con, "tag4")
+@pytest_asyncio.fixture(scope="module")
+async def t(setup_client: Client):
+    t = setup_client.transaction()
+    await insert_tag(t, Tag(name="tag1"), Tag(name="tag2"))
+    yield t
+    await t.rollback()
 
 
-if __name__ == "__main__":
-    unittest.main()
+async def test_check_tag(t: Transaction):
+    assert await check_tag(t, "tag1")
+    assert await check_tag(t, "tag2")
+    assert not await check_tag(t, "tag3")
+    assert not await check_tag(t, "tag4")

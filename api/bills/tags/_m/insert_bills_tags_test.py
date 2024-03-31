@@ -1,4 +1,4 @@
-import unittest
+from libsql_client import Transaction
 
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
@@ -8,32 +8,23 @@ from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags.model import BillTag, Tag
 
 
-class TestStringMethods(unittest.TestCase):
-    @classmethod
-    def tearDownClass(cls):
-        cls.con.rollback()
-
-    def test_insert_bills_tags(self):
-        date_sample = "2024-01-01T00:00:00Z"
-        bill1 = Bill(id=1, name="bill1", value="9999", date=date_sample)
-        tag1 = Tag(id=1, name="tag1")
-        tag2 = Tag(id=2, name="tag2")
-        tag3 = Tag(id=3, name="tag3")
-        insert_bill(self.con, bill1)
-        insert_tag(self.con, tag1, tag2, tag3)
-        insert_bills_tags(
-            self.con,
-            BillTag(bill_id=1, tag_id=1),
-            BillTag(bill_id=1, tag_id=2),
-            BillTag(bill_id=1, tag_id=3),
-        )
-        bill_list = fetch_bills(self.con, FetchBillsParams(join_tags=True))
-        assert len(bill_list) == 1
-        assert len(bill_list[0].tags) == 3
-        assert bill_list[0].tags[0].name == "tag1"
-        assert bill_list[0].tags[1].name == "tag2"
-        assert bill_list[0].tags[2].name == "tag3"
-
-
-if __name__ == "__main__":
-    unittest.main()
+async def test_insert_bills_tags(t: Transaction):
+    date_sample = "2024-01-01T00:00:00Z"
+    bill1 = Bill(id=1, name="bill1", value="9999", date=date_sample)
+    tag1 = Tag(id=1, name="tag1")
+    tag2 = Tag(id=2, name="tag2")
+    tag3 = Tag(id=3, name="tag3")
+    await insert_bill(t, bill1)
+    await insert_tag(t, tag1, tag2, tag3)
+    await insert_bills_tags(
+        t,
+        BillTag(bill_id=1, tag_id=1),
+        BillTag(bill_id=1, tag_id=2),
+        BillTag(bill_id=1, tag_id=3),
+    )
+    bill_list = await fetch_bills(t, FetchBillsParams(join_tags=True))
+    assert len(bill_list) == 1
+    assert len(bill_list[0].tags) == 3
+    assert bill_list[0].tags[0].name == "tag1"
+    assert bill_list[0].tags[1].name == "tag2"
+    assert bill_list[0].tags[2].name == "tag3"

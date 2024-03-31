@@ -1,5 +1,6 @@
-from sqlite3 import Connection
 from typing import Any, Callable, Dict, List, TypeVar
+
+from libsql_client import Transaction
 
 from api.models import TableModel
 
@@ -20,8 +21,8 @@ def treat_data(mapper: TMapper[T], *args: T):
     return (model_columns, params_string, model_objects_values)
 
 
-def insert_data(
-    con: Connection, TableModel: T, mapper: TMapper[T], *args: T
+async def insert_data(
+    t: Transaction, TableModel: T, mapper: TMapper[T], *args: T
 ) -> List[T]:
     sql_columns, params_string, model_objects_values = treat_data(mapper, *args)
     sql = f"""
@@ -29,8 +30,8 @@ def insert_data(
                 VALUES {", ".join(params_string)}
                 RETURNING *;
                 """
-    result = con.execute(
+    cur = await t.execute(
         sql,
         model_objects_values,
-    ).fetchall()
-    return [TableModel(**row) for row in result]
+    )
+    return [TableModel(**(row.asdict())) for row in cur.rows]

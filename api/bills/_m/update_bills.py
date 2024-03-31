@@ -1,5 +1,4 @@
-from sqlite3 import Connection
-
+from libsql_client import Transaction
 from pydantic import BaseModel
 
 
@@ -8,5 +7,7 @@ class UpdateBillsInput(BaseModel):
     main_tag_id: int
 
 
-def update_main_tag(con: Connection, main_tag_id: int, bill_id: int):
-    con.execute("UPDATE bills SET main_tag_id = ? WHERE id = ?", [main_tag_id, bill_id])
+async def update_main_tag(t: Transaction, main_tag_id: int, bill_id: int):
+    return await t.execute(
+        "UPDATE bills SET main_tag_id = ? WHERE id = ?", [main_tag_id, bill_id]
+    )

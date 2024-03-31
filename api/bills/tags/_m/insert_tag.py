@@ -1,4 +1,4 @@
-from sqlite3 import Connection
+from libsql_client import Transaction
 
 from api._m.insert_data import insert_data
 from api.bills.tags.model import Tag
@@ -9,5 +9,5 @@ def map_tag(tag: Tag):
     return dict
 
 
-def insert_tag(con: Connection, *args: Tag):
-    return insert_data(con, Tag, map_tag, *args)
+async def insert_tag(t: Transaction, *args: Tag):
+    return await insert_data(t, Tag, map_tag, *args)

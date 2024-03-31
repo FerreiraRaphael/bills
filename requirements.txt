@@ -29,6 +29,7 @@ pydash==7.0.7
 pydocstyle==6.3.0
 pyflakes==3.2.0
 pytest==8.1.1
+pytest-asyncio==0.23.6
 PyYAML==6.0.1
 regex==2023.12.25
 ruff==0.3.3
