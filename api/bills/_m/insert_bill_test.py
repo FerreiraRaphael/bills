@@ -4,9 +4,9 @@ from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
 
+date_sample = "2024-01-01T00:00:00Z"
 
 async def test_insert_one_return(t: Transaction):
-    date_sample = "2024-01-01T00:00:00Z"
     bill1 = Bill(id=1, name="multi1", value="9999", date=date_sample)
     [res1] = await insert_bill(t, bill1)
     assert res1.name == bill1.name
@@ -16,7 +16,6 @@ async def test_insert_one_return(t: Transaction):
 
 
 async def test_insert_single(t: Transaction):
-    date_sample = "2024-01-01T00:00:00Z"
     await insert_bill(t, Bill(id=1, name="single1", value="9999", date=date_sample))
     await insert_bill(t, Bill(id=2, name="single2", value="9999", date=date_sample))
     await insert_bill(t, Bill(id=3, name="single3", value="9999", date=date_sample))
@@ -31,7 +30,6 @@ async def test_insert_single(t: Transaction):
 
 
 async def test_insert_multiple(t: Transaction):
-    date_sample = "2024-01-01T00:00:00Z"
     bill1 = Bill(id=1, name="multi1", value="9999", date=date_sample)
     bill2 = Bill(id=2, name="multi2", value="9999", date=date_sample)
     bill3 = Bill(id=3, name="multi3", value="9999", date=date_sample)
@@ -47,7 +45,6 @@ async def test_insert_multiple(t: Transaction):
 
 
 async def test_insert_return(t: Transaction):
-    date_sample = "2024-01-01T00:00:00Z"
     bill1 = Bill(id=1, name="multi1", value="9999", date=date_sample)
     bill2 = Bill(id=2, name="multi2", value="9999", date=date_sample)
     bill3 = Bill(id=3, name="multi3", value="9999", date=date_sample)

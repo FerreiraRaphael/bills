@@ -30,8 +30,8 @@ async def insert_data(
                 VALUES {", ".join(params_string)}
                 RETURNING *;
                 """
-    cur = await t.execute(
+    res = await t.execute(
         sql,
         model_objects_values,
     )
-    return [TableModel(**(row.asdict())) for row in cur.rows]
+    return [TableModel(**(row.asdict())) for row in res.rows]

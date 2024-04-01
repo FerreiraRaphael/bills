@@ -1,80 +1,58 @@
 import functools
 from io import StringIO
-
-import aiosqlite
+from contextlib import asynccontextmanager
 import yaml
-from fastapi import FastAPI, Request, Response
-from libsql_client import create_client, dbapi2
-
+from typing import Annotated
+from fastapi import FastAPI, Request, Response, Depends
+from libsql_client import create_client, Transaction
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
+from api.env import get_env
+# from dotenv import load_dotenv
 
+# load_dotenv(override=True)
 
-def create_con(db_path: str, trace_callback=None):
-    print("help", aiosqlite)
-
-    def dict_factory(cursor, row):
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d
-
-    con = dbapi2.connect(
-        db_path,
-        uri=True,
-        detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print('DB connecting.',
+      get_env("DB_URL"),
+      # "Using Auth token db" if get_env("DB_AUTH") else ""
     )
-    con.row_factory = dict_factory
-    con.set_trace_callback(trace_callback)
-    return con
+    async with create_client(
+        url=get_env("DB_URL"),
+        auth_token=get_env("DB_AUTH")
+    ) as db:
+      print('To DB Connected.')
+      app.state.db = db
+      yield
+      print('Closing DB Connection.')
+      await db.close()
 
+async def t(req: Request):
+    try:
+        t: Transaction = req.app.state.db.transaction()
+        yield t
+        await t.commit()
+    except Exception as e:
+        await t.rollback()
+        raise e
 
-async def async_create_con(db_path: str, trace_callback=None):
-    def dict_factory(cursor, row):
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d
+DTransaction = Annotated[Transaction, Depends(t)]
 
-    con = await aiosqlite.connect(
-        db_path,
-        uri=True,
-        detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
-    )
-    con.row_factory = dict_factory
-    await con.set_trace_callback(trace_callback)
-    return con
-    # con = await aiosqlite.connect(
-    #     db_path,
-    #     uri=True,
-    #     detect_types=dbapi2.PARSE_COLNAMES | dbapi2.PARSE_DECLTYPES,
-    # )
-
-
-def async_create_db_client(db_path: str):
-    return create_client(db_path)
-
-
-con = create_con("file:db/dev.sqlite")
-
-app = FastAPI()
-
-
-@app.middleware("http")
-def add_stuff(request: Request, call_next):
-    request.stuff = "go"
-    return call_next(request)
-
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
-async def root(request: Request):
-    return fetch_bills(con)
+async def root(t: DTransaction):
+    return await fetch_bills(t)
 
 
 @app.post("/add_bills")
-async def add_new_bill(request: Request, bills: list[Bill]):
-    return insert_bill(con, *bills)
+async def add_new_bill(
+        t: DTransaction,
+        bills: list[Bill]
+    ):
+    return await insert_bill(t, *bills)
 
 
 @app.get("/ping")
