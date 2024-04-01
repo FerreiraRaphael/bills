@@ -6,6 +6,7 @@ from api.bills.model import Bill
 
 date_sample = "2024-01-01T00:00:00Z"
 
+
 async def test_insert_one_return(t: Transaction):
     bill1 = Bill(id=1, name="multi1", value="9999", date=date_sample)
     [res1] = await insert_bill(t, bill1)

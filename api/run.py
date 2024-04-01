@@ -1,33 +1,37 @@
 import functools
-from io import StringIO
 from contextlib import asynccontextmanager
-import yaml
+from io import StringIO
 from typing import Annotated
-from fastapi import FastAPI, Request, Response, Depends
-from libsql_client import create_client, Transaction
+
+import yaml
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, Request, Response
+from libsql_client import Transaction, create_client
+
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
 from api.env import get_env
-# from dotenv import load_dotenv
 
-# load_dotenv(override=True)
+load_dotenv(override=True)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print('DB connecting.',
-      get_env("DB_URL"),
-      # "Using Auth token db" if get_env("DB_AUTH") else ""
+    print(
+        "DB connecting.",
+        get_env("DB_URL"),
+        "Using Auth token db" if get_env("DB_AUTH") else "",
     )
     async with create_client(
-        url=get_env("DB_URL"),
-        auth_token=get_env("DB_AUTH")
+        url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
     ) as db:
-      print('To DB Connected.')
-      app.state.db = db
-      yield
-      print('Closing DB Connection.')
-      await db.close()
+        print("To DB Connected.")
+        app.state.db = db
+        yield
+        print("Closing DB Connection.")
+        await db.close()
+
 
 async def t(req: Request):
     try:
@@ -38,9 +42,11 @@ async def t(req: Request):
         await t.rollback()
         raise e
 
+
 DTransaction = Annotated[Transaction, Depends(t)]
 
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 async def root(t: DTransaction):
@@ -48,10 +54,7 @@ async def root(t: DTransaction):
 
 
 @app.post("/add_bills")
-async def add_new_bill(
-        t: DTransaction,
-        bills: list[Bill]
-    ):
+async def add_new_bill(t: DTransaction, bills: list[Bill]):
     return await insert_bill(t, *bills)
 
 

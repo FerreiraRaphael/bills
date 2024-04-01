@@ -39,7 +39,7 @@ jobs:
           cache: 'pip'
       - run: pip install -r requirements.txt
       - name: Testing
-        run: pytest
+        run: DB_URL="file:db/test.sqlite" pytest
   Linter-and-format:
     needs: Setup-Python
     runs-on: ubuntu-latest
