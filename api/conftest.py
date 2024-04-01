@@ -17,8 +17,7 @@ async def setup_client():
         # auth_token=get_env("DB_AUTH")
         url="file:db/test.sqlite"
     ) as client:
-
-        client.batch()
+        # client.batch()
         yield client
         await client.close()
 
