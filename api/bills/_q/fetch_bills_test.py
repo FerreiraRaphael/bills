@@ -12,24 +12,26 @@ from api.logger import RequestLogger
 
 
 @pytest_asyncio.fixture(scope="module")
-async def t(setup_client: Client):
+async def t(setup_client: Client, log: RequestLogger):
     t = setup_client.transaction()
     date_sample = "2024-01-01T00:00:00Z"
     await insert_bill(
         t,
+        log,
         Bill(id=1, name="name", value=9999, date=date_sample),
         Bill(id=2, name="name2", value=9999, date=date_sample),
     )
     await insert_tag(
         t,
+        log,
         Tag(id=1, name="name"),
         Tag(id=2, name="name2"),
         Tag(id=3, name="name3"),
     )
     await insert_bills_tags(
-        t, BillTag(bill_id=1, tag_id=2), BillTag(bill_id=1, tag_id=1)
+        t, log, BillTag(bill_id=1, tag_id=2), BillTag(bill_id=1, tag_id=1)
     )
-    await update_main_tag(t, 3, 1)
+    await update_main_tag(t, log, 3, 1)
     yield t
     await t.rollback()
 

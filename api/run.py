@@ -44,7 +44,8 @@ async def t(req: Request):
     try:
         t: Transaction = req.app.state.db.transaction()
         yield t
-        await t.commit()
+        if not t.closed:
+            await t.commit()
     except Exception as e:
         await t.rollback()
         raise e
@@ -68,6 +69,7 @@ async def root(t: DTransaction, logger: DLogger):
         return await fetch_bills(t, log)
     except Exception as e:
         log.exception("router fetch_bills fail", exc_info=e)
+        await t.rollback()
         return JSONResponse(
             status_code=500,
             content={"message": (f"An unhandled exception occurred: {e!r}.")},
@@ -75,8 +77,18 @@ async def root(t: DTransaction, logger: DLogger):
 
 
 @app.post("/add_bills")
-async def add_new_bill(t: DTransaction, bills: list[Bill]):
-    return await insert_bill(t, *bills)
+async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
+    log = logger.getChild(__name__, __file__)
+    try:
+        log.info(f"router add_new_bill {list(map(lambda x: x.json(), bills))}")
+        return await insert_bill(t, log, *bills)
+    except Exception as e:
+        log.exception("router add_new_bill fail", exc_info=e)
+        await t.rollback()
+        return JSONResponse(
+            status_code=500,
+            content={"message": (f"An unhandled exception occurred: {e!r}.")},
+        )
 
 
 @app.get("/ping")

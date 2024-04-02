@@ -3,6 +3,7 @@ from pydash import omit
 
 from api._m.insert_data import insert_data
 from api.bills.model import Bill
+from api.logger import RequestLogger
 
 
 def map_bill(bill: Bill):
@@ -12,5 +13,13 @@ def map_bill(bill: Bill):
     return omit(dict, *Bill.__join_fields__)
 
 
-async def insert_bill(t: Transaction, *args: Bill):
-    return await insert_data(t, Bill, map_bill, *args)
+async def insert_bill(t: Transaction, logger: RequestLogger, *args: Bill):
+    log = logger.getChild(__name__, __file__)
+    try:
+        log.debug(f"insert_bill {list(map(lambda x: x.json(), args))}")
+        result = await insert_data(t, Bill, map_bill, *args)
+        log.debug(f"insert_bill result {list(map(lambda x: x.json(), result))}")
+        return result
+    except Exception as e:
+        log.exception("failed in insert_bill", exc_info=e)
+        raise e

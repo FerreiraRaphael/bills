@@ -23,8 +23,13 @@ async def setup_client():
 @pytest_asyncio.fixture(scope="function")
 async def t(setup_client: Client):
     t = setup_client.transaction()
-    yield t
-    await t.rollback()
+    try:
+        yield t
+        await t.rollback()
+    except Exception as e:
+        await t.rollback()
+        raise e
+
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -35,5 +40,5 @@ async def setup_log():
 
 @pytest_asyncio.fixture(scope="module")
 async def log(setup_log: logging.Logger):
-    logger = await create_request_logger(parent_logger=setup_log, url_path=__file__)
+    logger = await create_request_logger(parent_logger=setup_log, url_path="testing")
     yield logger

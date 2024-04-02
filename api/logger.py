@@ -98,14 +98,14 @@ class RequestLogger:
         if self.__check_files_allowed():
             return self.__direct_log(logging.DEBUG, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.DEBUG):
-            return self.logger.error(msg, *args, **kwargs)
+            return self.logger.debug(msg, *args, **kwargs)
         self.buffer.append((logging.DEBUG, msg, args, kwargs))
 
     def warning(self, msg, *args, **kwargs):
         if self.__check_files_allowed():
             return self.__direct_log(logging.WARNING, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.WARNING):
-            return self.logger.error(msg, *args, **kwargs)
+            return self.logger.warning(msg, *args, **kwargs)
         self.buffer.append((logging.WARNING, msg, args, kwargs))
 
     def info(self, msg, *args, **kwargs):
@@ -167,10 +167,9 @@ class RequestLogger:
 def create_logger():
     logger = logging.getLogger("API")
     logger.setLevel(logging.ERROR)
-
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.ERROR)
 
     ch.setFormatter(CustomFormatter())
     logger.addHandler(ch)
