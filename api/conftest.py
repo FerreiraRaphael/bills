@@ -13,7 +13,7 @@ async def setup_client():
     async with create_client(
         auth_token=get_env("DB_AUTH"), url=get_env("DB_URL")
     ) as client:
-        # client.batch()
+        # call clean_db.sql here
         yield client
         await client.close()
 

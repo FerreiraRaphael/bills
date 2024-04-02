@@ -50,7 +50,7 @@ coverage.xml
 docs/_build/
 *.sqlite
 *.sqlite-journal
-
+logs.txt
 
 # Venv files
 .venv

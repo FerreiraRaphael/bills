@@ -1,6 +1,9 @@
+import fnmatch
 import logging
 import subprocess
 import uuid
+import os
+import aiofiles
 from typing import Any, List, Optional, Tuple
 
 from fastapi import Request
@@ -42,17 +45,26 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-
+current_dir = os.getcwd() + '/'
 class LogFiles:
     paths_git_status: List[str] = []
     paths_inserted: List[str] = []
 
-    def __init__(self, paths_git_status: List[str]):
+    def __init__(self, paths_git_status: List[str], paths_inserted: List[str]):
         self.paths_git_status = paths_git_status
-        self.paths_inserted = []
+        self.paths_inserted = paths_inserted
 
     def paths(self):
         return [*self.paths_git_status, *self.paths_inserted]
+
+    def check_file(self, file_path: str):
+        file = file_path.replace(current_dir, '')
+        for pattern in self.paths():
+          if file == pattern:
+            return True
+          if fnmatch.fnmatch(file, pattern):
+            return True
+        return False
 
 
 class RequestLogger:
@@ -81,36 +93,40 @@ class RequestLogger:
         self.file_name = file_name
 
     def debug(self, msg, *args, **kwargs):
+        if self.__check_files_allowed():
+            return self.__direct_log(logging.DEBUG, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.error(msg, *args, **kwargs)
-        else:
-            self.buffer.append((logging.DEBUG, msg, args, kwargs))
+            return self.logger.error(msg, *args, **kwargs)
+        self.buffer.append((logging.DEBUG, msg, args, kwargs))
 
     def warning(self, msg, *args, **kwargs):
+        if self.__check_files_allowed():
+            return self.__direct_log(logging.WARNING, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.WARNING):
-            self.logger.error(msg, *args, **kwargs)
-        else:
-            self.buffer.append((logging.WARNING, msg, args, kwargs))
+            return self.logger.error(msg, *args, **kwargs)
+        self.buffer.append((logging.WARNING, msg, args, kwargs))
 
     def info(self, msg, *args, **kwargs):
+        if self.__check_files_allowed():
+            return self.__direct_log(logging.INFO, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.INFO):
-            self.logger.info(msg, *args, **kwargs)
-        else:
-            self.buffer.append((logging.INFO, msg, args, kwargs))
+            return self.logger.info(msg, *args, **kwargs)
+        self.buffer.append((logging.INFO, msg, args, kwargs))
 
     def error(self, msg, *args, **kwargs):
+        if self.__check_files_allowed():
+            return self.__direct_log(logging.ERROR, msg, *args, **kwargs)
         if self.logger.isEnabledFor(logging.ERROR):
-            self.logger.error(msg, *args, **kwargs)
-        else:
-            self.buffer.append((logging.ERROR, msg, args, kwargs))
+            return self.logger.error(msg, *args, **kwargs)
+        self.buffer.append((logging.ERROR, msg, args, kwargs))
 
     def exception(self, msg, *args, **kwargs):
-        self.flush()
+        self.__flush()
         self.logger.exception(msg, *args, **kwargs)
 
     def getChild(self, suffix: str, file: str):
         logger = self.logger.logger.getChild(suffix)
-        adapter = self.__make_adapter__(logger, file)
+        adapter = self.__make_adapter(logger, file)
         request_logger = RequestLogger(
             logger=adapter,
             url_path=self.url_path,
@@ -122,23 +138,28 @@ class RequestLogger:
         self.child = request_logger
         return request_logger
 
-    def flush(self):
+    def __flush(self):
         if self.parent is not None:
-            return self.parent.flush()
+            return self.parent.__flush()
         for lvl, msg, args, kwargs in self.buffer:
-            if self.logger.process is not None:
-                msg, kwargs = self.logger.process(msg, kwargs)
-            self.logger._log(lvl, msg, args, **kwargs)
+            self.__direct_log(lvl, msg, args, **kwargs)
         self.buffer.clear()
         if self.child is not None:
             self.child.parent = None
-            self.child.flush()
+            self.child.__flush()
 
-    def __make_adapter__(self, logger: logging.Logger, file: str):
+    def __direct_log(self, lvl, msg, *args, **kwargs):
+        if self.logger.process is not None:
+            msg, kwargs = self.logger.process(msg, kwargs)
+        self.logger._log(lvl, msg, args, **kwargs)
+
+    def __make_adapter(self, logger: logging.Logger, file: str):
         return logging.LoggerAdapter(
             logger=logger, extra={"url_path": self.url_path, "file_name": file}
         )
 
+    def __check_files_allowed(self):
+        return self.log_files.check_file(self.file_name)
 
 def create_logger():
     logger = logging.getLogger("API")
@@ -153,10 +174,9 @@ def create_logger():
     return logger
 
 
-def create_request_logger(req: Request):
+async def create_request_logger(req: Request):
     request_id = str(uuid.uuid4())
     logger: logging.Logger = req.app.state.logger.getChild(request_id)
-    logger.getChild(request_id)
     logger = logging.LoggerAdapter(
         logger=logger,
         extra={
@@ -164,9 +184,14 @@ def create_request_logger(req: Request):
             "file_name": __file__,
         },
     )
+    paths_inserted = []
+    async with aiofiles.open('logs.txt', mode='r') as file:
+        content = await file.read()
+        paths_inserted.extend(content.split('\n'))
+
     return RequestLogger(
         logger=logger,
         url_path=req.url.path,
         file_name=__file__,
-        log_files=LogFiles(paths_git_status=git_status),
+        log_files=LogFiles(paths_git_status=git_status, paths_inserted=paths_inserted),
     )

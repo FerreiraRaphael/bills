@@ -1,12 +1,14 @@
 import functools
 from contextlib import asynccontextmanager
 from io import StringIO
-from typing import Annotated
-
+from typing import Annotated, List
+import aiofiles
+from pydantic import BaseModel
 import yaml
+from pydash import uniq
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from libsql_client import Transaction, create_client
 
 from api.bills._m.insert_bill import insert_bill
@@ -47,8 +49,8 @@ async def t(req: Request):
         raise e
 
 
-def log(req: Request):
-    yield create_request_logger(req)
+async def log(req: Request):
+    yield await create_request_logger(req)
 
 
 DTransaction = Annotated[Transaction, Depends(t)]
@@ -79,6 +81,32 @@ async def add_new_bill(t: DTransaction, bills: list[Bill]):
 @app.get("/ping")
 async def ping():
     return "pingg"
+
+class LoggerInput(BaseModel):
+    logs: List[str]
+    append = True
+
+@app.post("/logger", response_class=PlainTextResponse)
+async def logger(input: LoggerInput):
+    if input.append:
+        lines = input.logs
+        async with aiofiles.open('logs.txt', mode='r') as file:
+            text = await file.read()
+            lines.extend(text.split('\n'))
+        unique_lines = uniq(lines)
+        async with aiofiles.open('logs.txt', mode='w') as file:
+            await file.write('\n'.join(unique_lines))
+    else:
+        async with aiofiles.open('logs.txt', mode='w') as file:
+            await file.writelines(input.logs)
+    async with aiofiles.open('logs.txt', mode='r') as file:
+        return await file.read()
+
+
+@app.get("/logger", response_class=PlainTextResponse)
+async def logger():
+    async with aiofiles.open('logs.txt', mode='r') as file:
+        return await file.read()
 
 
 @app.get("/openapi.yaml", include_in_schema=False)
