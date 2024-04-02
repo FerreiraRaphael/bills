@@ -7,7 +7,9 @@ from pydantic import BaseModel
 
 from api.bills.model import Bill
 from api.bills.tags.model import Tag
+from api.logger import RequestLogger
 from api.models import TableModel
+
 from packages.sql_eng import JinjaSql
 
 sql_path = os.path.join(os.path.dirname(__file__))
@@ -35,10 +37,19 @@ class FetchBillsParams(BaseModel):
     join_main_tag: Optional[bool]
 
 
-async def fetch_bills(con: Transaction, params: FetchBillsParams = None):
-    dic = params.dict() if params else {}
-    sql, params = sql_eng.prepare_query(
-        "fetch_bills.sql", {**(dic), "render_tag": render_cls_fields(Tag)}
-    )
-    result = await con.execute(sql, params)
-    return [Bill(**(row.asdict())) for row in result.rows]
+async def fetch_bills(t: Transaction, logger: RequestLogger, params: FetchBillsParams = None):
+    l = logger.getChild(__name__, __file__)
+    try:
+      l.debug("fetch bills", params.json()) if params else {}
+      dic = params.dict() if params else {}
+      sql, params = sql_eng.prepare_query(
+          "fetch_bills.sql", {**(dic), "render_tag": render_cls_fields(Tag)}
+      )
+      result = await t.execute(sql, params)
+      l.debug(f'result execute {sql}, {params}, {result.rows}')
+      bills = [Bill(**(row.asdict())) for row in result.rows]
+      l.debug(f'bills result {bills}')
+      return bills
+    except Exception as e:
+      l.exception('failed in fetch bills', exc_info=e)
+      raise e
