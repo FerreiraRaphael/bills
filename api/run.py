@@ -1,27 +1,19 @@
-import asyncio
 import functools
 from contextlib import asynccontextmanager
 from io import StringIO
-from typing import Annotated, Optional, List, Any, Tuple
-import uuid
-import time
-import sys
-from fastapi.responses import JSONResponse
-from starlette.routing import Match
-import fnmatch
+from typing import Annotated
 
 import yaml
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 from libsql_client import Transaction, create_client
 
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
 from api.bills.model import Bill
-from api.bills.t import anotherFunc
 from api.env import get_env
-
-from api.logger import create_logger, RequestLogger, create_request_logger
+from api.logger import RequestLogger, create_logger, create_request_logger
 
 load_dotenv(override=True)
 
@@ -54,31 +46,28 @@ async def t(req: Request):
         await t.rollback()
         raise e
 
-def l(req: Request):
+
+def log(req: Request):
     yield create_request_logger(req)
 
+
 DTransaction = Annotated[Transaction, Depends(t)]
-DLogger = Annotated[RequestLogger, Depends(l)]
+DLogger = Annotated[RequestLogger, Depends(log)]
 
 app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
 async def root(t: DTransaction, logger: DLogger):
-    l = logger.getChild(__name__, __file__)
+    log = logger.getChild(__name__, __file__)
     try:
-
-        l.info('router fetch_bills')
-        return await fetch_bills(t, l)
+        log.info("router fetch_bills")
+        return await fetch_bills(t, log)
     except Exception as e:
-        l.exception('router fetch_bills fail', exc_info=e)
+        log.exception("router fetch_bills fail", exc_info=e)
         return JSONResponse(
-        status_code=500,
-        content={
-            "message": (
-                f"An unhandled exception occurred: {e!r}."
-            )
-          },
+            status_code=500,
+            content={"message": (f"An unhandled exception occurred: {e!r}.")},
         )
 
 
@@ -88,7 +77,7 @@ async def add_new_bill(t: DTransaction, bills: list[Bill]):
 
 
 @app.get("/ping")
-async def ping(l: DLogger):
+async def ping():
     return "pingg"
 
 
@@ -100,13 +89,10 @@ def read_openapi_yaml() -> Response:
     yaml.dump(openapi_json, yaml_s)
     return Response(yaml_s.getvalue(), media_type="text/yaml")
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
-        content={
-            "message": (
-                f"An unhandled exception occurred: {exc!r}."
-            )
-        },
+        content={"message": (f"An unhandled exception occurred: {exc!r}.")},
     )
