@@ -1,12 +1,11 @@
 import fnmatch
 import logging
+import os
 import subprocess
 import uuid
-import os
-import aiofiles
 from typing import Any, List, Optional, Tuple
 
-from fastapi import Request
+import aiofiles
 
 command = ["git", "status", "-s"]
 
@@ -45,7 +44,10 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-current_dir = os.getcwd() + '/'
+
+current_dir = os.getcwd() + "/"
+
+
 class LogFiles:
     paths_git_status: List[str] = []
     paths_inserted: List[str] = []
@@ -58,12 +60,12 @@ class LogFiles:
         return [*self.paths_git_status, *self.paths_inserted]
 
     def check_file(self, file_path: str):
-        file = file_path.replace(current_dir, '')
+        file = file_path.replace(current_dir, "")
         for pattern in self.paths():
-          if file == pattern:
-            return True
-          if fnmatch.fnmatch(file, pattern):
-            return True
+            if file == pattern:
+                return True
+            if fnmatch.fnmatch(file, pattern):
+                return True
         return False
 
 
@@ -161,6 +163,7 @@ class RequestLogger:
     def __check_files_allowed(self):
         return self.log_files.check_file(self.file_name)
 
+
 def create_logger():
     logger = logging.getLogger("API")
     logger.setLevel(logging.ERROR)
@@ -174,24 +177,27 @@ def create_logger():
     return logger
 
 
-async def create_request_logger(req: Request):
+async def create_request_logger(
+    parent_logger: logging.Logger,
+    url_path: str,
+):
     request_id = str(uuid.uuid4())
-    logger: logging.Logger = req.app.state.logger.getChild(request_id)
+    logger: logging.Logger = parent_logger.getChild(request_id)
     logger = logging.LoggerAdapter(
         logger=logger,
         extra={
-            "url_path": req.url.path,
+            "url_path": url_path,
             "file_name": __file__,
         },
     )
     paths_inserted = []
-    async with aiofiles.open('logs.txt', mode='r') as file:
+    async with aiofiles.open("logs.txt", mode="r") as file:
         content = await file.read()
-        paths_inserted.extend(content.split('\n'))
+        paths_inserted.extend(content.split("\n"))
 
     return RequestLogger(
         logger=logger,
-        url_path=req.url.path,
+        url_path=url_path,
         file_name=__file__,
         log_files=LogFiles(paths_git_status=git_status, paths_inserted=paths_inserted),
     )

@@ -41,7 +41,7 @@ async def fetch_bills(
 ):
     log = logger.getChild(__name__, __file__)
     try:
-        log.debug("fetch bills", params.json()) if params else {}
+        log.debug(f"fetch bills {params.json()}") if params else {}
         dic = params.dict() if params else {}
         sql, params = sql_eng.prepare_query(
             "fetch_bills.sql", {**(dic), "render_tag": render_cls_fields(Tag)}

@@ -2,14 +2,15 @@ import functools
 from contextlib import asynccontextmanager
 from io import StringIO
 from typing import Annotated, List
+
 import aiofiles
-from pydantic import BaseModel
 import yaml
-from pydash import uniq
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.responses import JSONResponse, PlainTextResponse
 from libsql_client import Transaction, create_client
+from pydantic import BaseModel
+from pydash import uniq
 
 from api.bills._m.insert_bill import insert_bill
 from api.bills._q.fetch_bills import fetch_bills
@@ -50,7 +51,7 @@ async def t(req: Request):
 
 
 async def log(req: Request):
-    yield await create_request_logger(req)
+    yield await create_request_logger(req.app.state.logger, req.url.path)
 
 
 DTransaction = Annotated[Transaction, Depends(t)]
@@ -82,30 +83,32 @@ async def add_new_bill(t: DTransaction, bills: list[Bill]):
 async def ping():
     return "pingg"
 
+
 class LoggerInput(BaseModel):
     logs: List[str]
     append = True
 
+
 @app.post("/logger", response_class=PlainTextResponse)
-async def logger(input: LoggerInput):
+async def post_logger(input: LoggerInput):
     if input.append:
         lines = input.logs
-        async with aiofiles.open('logs.txt', mode='r') as file:
+        async with aiofiles.open("logs.txt", mode="r") as file:
             text = await file.read()
-            lines.extend(text.split('\n'))
+            lines.extend(text.split("\n"))
         unique_lines = uniq(lines)
-        async with aiofiles.open('logs.txt', mode='w') as file:
-            await file.write('\n'.join(unique_lines))
+        async with aiofiles.open("logs.txt", mode="w") as file:
+            await file.write("\n".join(unique_lines))
     else:
-        async with aiofiles.open('logs.txt', mode='w') as file:
+        async with aiofiles.open("logs.txt", mode="w") as file:
             await file.writelines(input.logs)
-    async with aiofiles.open('logs.txt', mode='r') as file:
+    async with aiofiles.open("logs.txt", mode="r") as file:
         return await file.read()
 
 
 @app.get("/logger", response_class=PlainTextResponse)
-async def logger():
-    async with aiofiles.open('logs.txt', mode='r') as file:
+async def get_logger():
+    async with aiofiles.open("logs.txt", mode="r") as file:
         return await file.read()
 
 

@@ -8,6 +8,7 @@ from api.bills.model import Bill
 from api.bills.tags._m.insert_bills_tags import insert_bills_tags
 from api.bills.tags._m.insert_tag import insert_tag
 from api.bills.tags.model import BillTag, Tag
+from api.logger import RequestLogger
 
 
 @pytest_asyncio.fixture(scope="module")
@@ -33,9 +34,9 @@ async def t(setup_client: Client):
     await t.rollback()
 
 
-async def test_output_join(t: Transaction):
+async def test_output_join(t: Transaction, log: RequestLogger):
     bill_list = await fetch_bills(
-        t, FetchBillsParams(join_main_tag=True, join_tags=True)
+        t, log, FetchBillsParams(join_main_tag=True, join_tags=True)
     )
     assert len(bill_list) == 2
     assert bill_list[0].name == "name"
@@ -47,8 +48,8 @@ async def test_output_join(t: Transaction):
     assert bill_list[0].main_tag.name == "name3"
 
 
-async def test_output_no_join(t: Transaction):
-    bill_list = await fetch_bills(t)
+async def test_output_no_join(t: Transaction, log: RequestLogger):
+    bill_list = await fetch_bills(t, log)
     assert len(bill_list) == 2
     assert bill_list[0].tags is None
     assert bill_list[1].tags is None
