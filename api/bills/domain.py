@@ -51,4 +51,6 @@ async def create_new_bills_from_csv(t: Transaction, log: RequestLogger, text: st
     else:
         new_tag = await insert_tag(t, log, Tag(name=main_tag))
         main_tag_dict = new_tag[0].dict()
-        await update_main_tag(t, log, main_tag_id=main_tag_dict["id"], bill_id=bill_dict["id"])
+        await update_main_tag(
+            t, log, main_tag_id=main_tag_dict["id"], bill_id=bill_dict["id"]
+        )

@@ -10,7 +10,7 @@ from api.logger import RequestLogger
 csv_path = "api/bills/test.csv"
 
 
-async def test_create_new_bills_from_csv(t: Transaction,  log: RequestLogger):
+async def test_create_new_bills_from_csv(t: Transaction, log: RequestLogger):
     async with aiofiles.open(csv_path, "r") as file:
         data = await file.read()
         await create_new_bills_from_csv(t, log, data)
