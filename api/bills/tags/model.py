@@ -1,12 +1,15 @@
 import datetime
 from typing import Optional, Type, TypeVar
 
-from pydantic import BaseModel, validator
+from pydantic import validator
+
+from api.models import TableModel
 
 T = TypeVar("T", bound="Tag")
 
 
-class Tag(BaseModel):
+class Tag(TableModel):
+    __table_name__ = "tags"
     id: Optional[int]
     name: str
     created_at: Optional[datetime.datetime] = datetime.datetime.now()
@@ -23,3 +26,9 @@ class Tag(BaseModel):
     @classmethod
     def from_dict(cls: Type[T], dic: dict) -> T:
         return cls(**{k: v for k, v in dic.items()})
+
+
+class BillTag(TableModel):
+    __table_name__ = "bills_tags"
+    bill_id: int
+    tag_id: int

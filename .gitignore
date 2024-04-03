@@ -45,10 +45,12 @@ coverage.xml
 # Django stuff:
 *.log
 *.pot
-.env
+.env*
 # Sphinx documentation
 docs/_build/
 *.sqlite
 *.sqlite-journal
+logs.txt
 
+# Venv files
 .venv
