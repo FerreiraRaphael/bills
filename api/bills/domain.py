@@ -19,7 +19,8 @@ async def create_new_bills_from_csv(t: Transaction, text: str):
     tags_list = first_row["tags"].split(",")
     str_date_time = first_row["date"] + "T" + first_row["time"] + "Z"
     date = datetime.strptime(str_date_time, "%Y-%m-%dT%H:%M:%SZ")
-    new_bill = Bill(name=first_row["name"], value=float(first_row["number"]), date=date)
+    number_float_to_int = int(float(first_row['number'])*100)
+    new_bill = Bill(name=first_row["name"], value=number_float_to_int, date=date)
     new_bill_db_result = await insert_bill(t, new_bill)
     bill_dict = new_bill_db_result[0].dict()
     main_tag = first_row["main_tag"]
@@ -44,8 +45,9 @@ async def create_new_bills_from_csv(t: Transaction, text: str):
 
     if len(main_tag_id) != 0:
         main_tag_dict = main_tag_id[0]
-        update_main_tag(t, int(main_tag_dict["id"]), int(bill_dict["id"]))
+        await update_main_tag(t, main_tag_id=main_tag_dict["id"], bill_id=bill_dict["id"])
     else:
         new_tag = await insert_tag(t, Tag(name=main_tag))
         tag_dict = new_tag[0].dict()
-        update_main_tag(t, int(tag_dict["id"]), int(bill_dict["id"]))
+        await update_main_tag(t, main_tag_id=tag_dict["id"], bill_id=bill_dict["id"])
+        

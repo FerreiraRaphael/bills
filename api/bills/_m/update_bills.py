@@ -9,6 +9,7 @@ class UpdateBillsInput(BaseModel):
     main_tag_id: int
 
 
+<<<<<<< Updated upstream
 async def update_main_tag(
     t: Transaction, logger: RequestLogger, main_tag_id: int, bill_id: int
 ):
@@ -24,3 +25,10 @@ async def update_main_tag(
     except Exception as e:
         log.exception("failed in update_main_tag", exc_info=e)
         raise e
+=======
+async def update_main_tag(t: Transaction, main_tag_id: int, bill_id: int):
+    res = await t.execute(
+        "UPDATE bills SET main_tag_id = ? WHERE id = ?", [main_tag_id, bill_id]
+    )
+    return [row.asdict() for row in res.rows]
+>>>>>>> Stashed changes
