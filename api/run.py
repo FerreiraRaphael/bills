@@ -1,8 +1,9 @@
 import functools
+import os
 from contextlib import asynccontextmanager
 from io import StringIO
 from typing import Annotated, List
-import os
+
 import aiofiles
 import yaml
 from dotenv import load_dotenv
@@ -105,7 +106,7 @@ class LoggerInput(BaseModel):
 async def post_logger(input: LoggerInput):
     # if input.append:
     lines = input.logs
-    logs_path="logs.txt"
+    logs_path = "logs.txt"
     async with aiofiles.open(logs_path, mode="a", newline="\n") as file:
         if input.append and os.path.exists(logs_path):
             text = await file.read()
@@ -113,6 +114,7 @@ async def post_logger(input: LoggerInput):
         unique_lines = uniq(lines)
         await file.write("\n".join(unique_lines))
         return await file.read()
+
 
 @app.get("/logger", response_class=PlainTextResponse)
 async def get_logger():

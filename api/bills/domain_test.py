@@ -1,7 +1,7 @@
-import aiofiles
+# import aiofiles
 from libsql_client import Transaction
 
-from api.bills.domain import create_new_bills_from_csv
+# from api.bills.domain import create_new_bills_from_csv
 
 csv_path = "api/bills/test.csv"
 
