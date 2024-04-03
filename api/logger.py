@@ -190,9 +190,12 @@ async def create_request_logger(
         },
     )
     paths_inserted = []
-    async with aiofiles.open("logs.txt", mode="r") as file:
-        content = await file.read()
-        paths_inserted.extend(content.split("\n"))
+    try:
+        async with aiofiles.open("logs.txt", mode="r") as file:
+            content = await file.read()
+            paths_inserted.extend(content.split("\n"))
+    except Exception as e:
+        logger.warning("file don't exist", exc_info=e)
 
     return RequestLogger(
         logger=logger,
