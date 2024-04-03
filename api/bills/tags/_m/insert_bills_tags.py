@@ -9,7 +9,9 @@ def map_bills_tags(insert_bills_tags: BillTag):
     return insert_bills_tags.dict()
 
 
-async def insert_bills_tags(t: Transaction, logger: RequestLogger, *bills_tags_ids: BillTag):
+async def insert_bills_tags(
+    t: Transaction, logger: RequestLogger, *bills_tags_ids: BillTag
+):
     log = logger.getChild(__name__, __file__)
     try:
         log.debug(f"insert_bills_tags {list(map(lambda x: x.json(), bills_tags_ids))}")

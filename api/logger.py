@@ -23,7 +23,7 @@ git_status = awk_result.stdout.split("\n")
 
 class CustomFormatter(logging.Formatter):
     green = "\x1b[32;32m"
-    grey = "\x1b[34;34m"
+    blue = "\x1b[34;34m"
     yellow = "\x1b[33;20m"
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
@@ -32,7 +32,7 @@ class CustomFormatter(logging.Formatter):
     - %(name)s - %(url_path)s - %(file_name)s"""
 
     FORMATS = {
-        logging.DEBUG: grey + format + reset,
+        logging.DEBUG: blue + format + reset,
         logging.INFO: green + format + reset,
         logging.WARNING: yellow + format + reset,
         logging.ERROR: red + format + reset,

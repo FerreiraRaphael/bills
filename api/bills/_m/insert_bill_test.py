@@ -18,9 +18,15 @@ async def test_insert_one_return(t: Transaction, log: RequestLogger):
 
 
 async def test_insert_single(t: Transaction, log: RequestLogger):
-    await insert_bill(t, log, Bill(id=1, name="single1", value="9999", date=date_sample))
-    await insert_bill(t, log, Bill(id=2, name="single2", value="9999", date=date_sample))
-    await insert_bill(t, log, Bill(id=3, name="single3", value="9999", date=date_sample))
+    await insert_bill(
+        t, log, Bill(id=1, name="single1", value="9999", date=date_sample)
+    )
+    await insert_bill(
+        t, log, Bill(id=2, name="single2", value="9999", date=date_sample)
+    )
+    await insert_bill(
+        t, log, Bill(id=3, name="single3", value="9999", date=date_sample)
+    )
     bill_list = await fetch_bills(t, log)
     assert len(bill_list) == 3
     assert bill_list[0].name == "single1"
