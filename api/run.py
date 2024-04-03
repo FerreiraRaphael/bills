@@ -80,7 +80,7 @@ async def root(t: DTransaction, logger: DLogger):
 async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
     log = logger.getChild(__name__, __file__)
     try:
-        log.info(f"router add_new_bill")
+        log.info(f"router add_new_bill {list(map(lambda x: x.json(), bills))}")
         return await insert_bill(t, log, *bills)
     except Exception as e:
         log.exception("router add_new_bill fail", exc_info=e)

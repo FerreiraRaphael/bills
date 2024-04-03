@@ -31,14 +31,13 @@ async def t(setup_client: Client):
         raise e
 
 
-
 @pytest_asyncio.fixture(scope="session")
 async def setup_log():
     logger = create_logger()
     yield logger
 
 
-@pytest_asyncio.fixture(scope="module")
+@pytest_asyncio.fixture(scope="session")
 async def log(setup_log: logging.Logger):
     logger = await create_request_logger(parent_logger=setup_log, url_path="testing")
     yield logger

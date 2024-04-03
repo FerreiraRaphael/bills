@@ -16,9 +16,9 @@ def map_bill(bill: Bill):
 async def insert_bill(t: Transaction, logger: RequestLogger, *args: Bill):
     log = logger.getChild(__name__, __file__)
     try:
-        log.debug(f"insert_bill")
+        log.debug(f"insert_bill {list(map(lambda x: x.json(), args))}")
         result = await insert_data(t, Bill, map_bill, *args)
-        log.debug(f"insert_bill result")
+        log.debug(f"insert_bill result {list(map(lambda x: x.json(), result))}")
         return result
     except Exception as e:
         log.exception("failed in insert_bill", exc_info=e)
