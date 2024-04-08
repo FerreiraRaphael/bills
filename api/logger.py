@@ -2,21 +2,19 @@ import fnmatch
 import logging
 import os
 import subprocess
-import sys
 import uuid
 from typing import Any, List, Optional, Tuple
 
 import aiofiles
 from pydash import compact, map_
 
-is_windows = hasattr(sys, "getwindowsversion")
-
 command = ["git", "status", "-s"]
 
 result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
 
+print("aqui", result.stdout)
 git_status = compact(
-    map_(result.stdout.split("\n"), lambda x: x.split(" ")[2] if x else None)
+    map_(result.stdout.split("\n"), lambda x: x.split(" ")[1] if x else None)
 )
 
 

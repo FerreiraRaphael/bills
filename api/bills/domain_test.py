@@ -7,7 +7,7 @@ from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
 from api.bills.domain import create_new_bills_from_csv
 from api.logger import RequestLogger
 
-csv_path = "api/bills/test.csv"
+csv_path = "api/bills/domain_test.csv"
 
 
 async def test_create_new_bills_from_csv(t: Transaction, log: RequestLogger):
@@ -33,7 +33,7 @@ async def test_create_new_bills_from_csv(t: Transaction, log: RequestLogger):
 
         assert bill_list[35].name == "Amazon Prime Canais"
         assert bill_list[35].id == 36
-        assert bill_list[35].value == 994
+        assert bill_list[35].value == 995
         assert (
             datetime.strftime(bill_list[35].date, "%Y-%m-%dT%H:%M:%SZ")
             == "2024-03-02T00:00:00Z"
