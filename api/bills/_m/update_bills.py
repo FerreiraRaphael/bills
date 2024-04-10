@@ -20,7 +20,7 @@ async def update_main_tag(
             "UPDATE bills SET main_tag_id = ? WHERE id = ?", [main_tag_id, bill_id]
         )
         log.debug(f"update_main_tag result {result.rows}")
-        return None
+        return [row.asdict() for row in result.rows]
     except Exception as e:
         log.exception("failed in update_main_tag", exc_info=e)
         raise e
