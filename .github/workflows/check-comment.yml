@@ -1,0 +1,63 @@
+name: Deploy API
+defaults:
+  run:
+    working-directory: ./
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Ref (empty => use selected branch)
+        required: false
+      env:
+        description: 'Env to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - test
+          - dev
+  release:
+    types: [published]
+jobs:
+  deploy-api:
+    runs-on: self-hosted
+    concurrency:
+      group: poker-power-api-dev-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+        with:
+          fetch-depth: 0
+      - uses: hmarr/debug-action@v3
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        if: ${{ github.event_name != 'release' }}
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Successfully deployed
+
+      - name: Create comment
+        if: ${{ steps.fc.outputs.comment-id == 0 && github.event_name != 'release' }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Successfully deployed api:
+
+            - chegueiiii
+          reaction-type: 'rocket'
+
+      - name: Update comment
+        if: ${{ steps.fc.outputs.comment-id != 0 && github.event_name != 'release' }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            Successfully deployed api:
+
+            - chegueiii update
+          reaction-type: 'rocket'
