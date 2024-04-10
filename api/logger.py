@@ -6,19 +6,15 @@ import uuid
 from typing import Any, List, Optional, Tuple
 
 import aiofiles
+from pydash import compact, map_
 
 command = ["git", "status", "-s"]
 
 result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
 
-awk_command = ["awk", "{print $2}"]
-awk_input = result.stdout  # Convert the output to bytes for awk
-
-awk_result = subprocess.run(
-    awk_command, input=awk_input, stdout=subprocess.PIPE, text=True
+git_status = compact(
+    map_(result.stdout.split("\n"), lambda x: x.split(" ")[1] if x else None)
 )
-
-git_status = awk_result.stdout.split("\n")
 
 
 class CustomFormatter(logging.Formatter):
