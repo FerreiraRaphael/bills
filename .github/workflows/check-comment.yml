@@ -25,20 +25,26 @@ jobs:
         with:
           fetch-depth: 0
       - uses: hmarr/debug-action@v3
+      - run: |
+          BRANCH_NAME=${{ github.ref_name }}
+          PR_NUMBER=$(gh pr list --json number,headRefName | jq -r '.[] | select(.headRefName == "$BRANCH_NAME") | .number')
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
-        if: ${{ github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && github.event_name != 'release' }}
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ env.PR_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: Successfully deployed
 
       - name: Create comment
-        if: ${{ steps.fc.outputs.comment-id == 0 && github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && steps.fc.outputs.comment-id == 0 && github.event_name != 'release' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ env.PR_NUMBER }}
           body: |
             Successfully deployed api:
 
@@ -46,7 +52,7 @@ jobs:
           reaction-type: 'rocket'
 
       - name: Update comment
-        if: ${{ steps.fc.outputs.comment-id != 0 && github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && steps.fc.outputs.comment-id != 0 && github.event_name != 'release' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
