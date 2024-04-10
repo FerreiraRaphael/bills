@@ -1,6 +1,6 @@
 import csv
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 
 from libsql_client import Transaction
 

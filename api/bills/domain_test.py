@@ -45,3 +45,25 @@ async def test_create_new_bills_from_csv(t: Transaction, log: RequestLogger):
         assert bill_list[35].tags[1].id == 5
         assert bill_list[35].main_tag.name == "fixo"
         assert bill_list[35].main_tag.id == 4
+
+
+async def test_decimal_in_create_new_bills(t: Transaction, log: RequestLogger):
+    data = """"name","tags","number","date","main_tag","time"
+               bill1,tag1,5.1,2024-02-25,main_tag,00:00
+               bill2,tag1,2.2,2024-02-25,main_tag,00:00
+               bill3,tag1,4.1,2024-02-25,main_tag,00:00
+               bill4,tag1,13.84,2024-02-25,main_tag,00:00
+               bill5,tag1,3.3,2024-02-25,main_tag,00:00
+               bill6,tag1,0.11,2024-02-25,main_tag,00:00
+               bill7,tag1,1000.01,2024-02-25,main_tag,00:00"""
+
+    await create_new_bills_from_csv(t, log, data)
+    bill_list = await fetch_bills(t, log)
+    print(bill_list[0].name)
+    assert bill_list[0].value == 510
+    assert bill_list[1].value == 220
+    assert bill_list[2].value == 410
+    assert bill_list[3].value == 1384
+    assert bill_list[4].value == 330
+    assert bill_list[5].value == 11
+    assert bill_list[6].value == 100001
