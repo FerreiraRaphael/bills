@@ -34,14 +34,14 @@ jobs:
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
-        if: ${{ github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && github.event_name != 'release' }}
         with:
           issue-number: ${{ env.PR_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: Successfully deployed
 
       - name: Create comment
-        if: ${{ steps.fc.outputs.comment-id == 0 && github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && steps.fc.outputs.comment-id == 0 && github.event_name != 'release' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ env.PR_NUMBER }}
@@ -52,7 +52,7 @@ jobs:
           reaction-type: 'rocket'
 
       - name: Update comment
-        if: ${{ steps.fc.outputs.comment-id != 0 && github.event_name != 'release' }}
+        if: ${{ github.ref_name != 'main' && steps.fc.outputs.comment-id != 0 && github.event_name != 'release' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
