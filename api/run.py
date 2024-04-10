@@ -5,6 +5,7 @@ from io import StringIO
 from typing import Annotated, List
 
 import aiofiles
+import aiohttp
 import yaml
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Request, Response
@@ -52,12 +53,19 @@ async def t(req: Request):
         raise e
 
 
+async def http():
+    async with aiohttp.ClientSession() as session:
+        yield session
+        await session.close()
+
+
 async def log(req: Request):
     yield await create_request_logger(req.app.state.logger, req.url.path)
 
 
 DTransaction = Annotated[Transaction, Depends(t)]
 DLogger = Annotated[RequestLogger, Depends(log)]
+DHttp = Annotated[RequestLogger, Depends(http)]
 
 app = FastAPI(lifespan=lifespan)
 
