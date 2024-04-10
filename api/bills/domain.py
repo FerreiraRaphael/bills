@@ -1,4 +1,5 @@
 import csv
+from decimal import Decimal
 from datetime import datetime
 
 from libsql_client import Transaction
@@ -18,7 +19,7 @@ def treat_csv_row_data(row: dict):
     tags_list = [tag.lstrip() for tag in tags_list]
     str_date_time = row["date"] + "T" + row["time"] + ":00Z"
     date = datetime.strptime(str_date_time, "%Y-%m-%dT%H:%M:%SZ")
-    number_float_to_int = int(round(float(row["number"]) * 100))
+    number_float_to_int = int(Decimal(row["number"]) * 100)
     main_tag = row["main_tag"]
     return tags_list, date, number_float_to_int, main_tag
 

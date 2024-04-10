@@ -12,7 +12,6 @@ command = ["git", "status", "-s"]
 
 result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
 
-print("aqui", result.stdout)
 git_status = compact(
     map_(result.stdout.split("\n"), lambda x: x.split(" ")[1] if x else None)
 )
