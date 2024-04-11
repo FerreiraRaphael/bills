@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/function.js": {
+      "excludeFiles": "api/bills/domain_test.csv",
       "includeFiles": "api/**/*.py"
     }
  }
