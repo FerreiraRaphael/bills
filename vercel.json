@@ -1,7 +1,7 @@
 {
   "functions": {
-    "api": {
+    "api/function.js": {
       "includeFiles": "api/**/*.py"
     }
-  }
+ }
 }
