@@ -44,12 +44,12 @@ async def lifespan(app: FastAPI):
 
 async def t(req: Request):
     try:
-        t: Transaction = req.app.state.db.transaction()
-        yield t
-        if not t.closed:
-            await t.commit()
+        transaction: Transaction = req.app.state.db.transaction()
+        yield transaction
+        if not transaction.closed:
+            await transaction.commit()
     except Exception as e:
-        await t.rollback()
+        await transaction.rollback()
         raise e
 
 
@@ -128,32 +128,23 @@ async def get_logger():
         return await file.read()
 
 
-@router.get("/api/openapi.yaml", include_in_schema=False)
-@functools.lru_cache
-def read_openapi_yaml() -> Response:
-    openapi_json = app.openapi()
-    yaml_s = StringIO()
-    yaml.dump(openapi_json, yaml_s)
-    return Response(yaml_s.getvalue(), media_type="text/yaml")
-
-
-# @router.exception_handler(Exception)
-# async def global_exception_handler(request: Request, exc: Exception):
-#     return JSONResponse(
-#         status_code=500,
-#         content={"message": (f"An unhandled exception occurred: {exc!r}.")},
-#     )
-
-
 def create_api():
   app = FastAPI(lifespan=lifespan)
   app.include_router(router)
+
+  @app.get("/api/openapi.yaml", include_in_schema=False)
+  @functools.lru_cache
+  def read_openapi_yaml() -> Response:
+      openapi_json = app.openapi()
+      yaml_s = StringIO()
+      yaml.dump(openapi_json, yaml_s)
+      return Response(yaml_s.getvalue(), media_type="text/yaml")
+
   @app.exception_handler(Exception)
   async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={"message": (f"An unhandled exception occurred: {exc!r}.")},
     )
-
 
   return app
