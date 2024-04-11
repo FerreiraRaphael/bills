@@ -8,14 +8,14 @@ from typing import Any, List, Optional, Tuple
 import aiofiles
 from pydash import compact, map_
 
-command = ["git", "status", "-s"]
+# command = ["git", "status", "-s"]
 
-result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
+# result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
 
-git_status = compact(
-    map_(result.stdout.split("\n"), lambda x: x.split(" ")[1] if x else None)
-)
-
+# git_status = compact(
+#     map_(result.stdout.split("\n"), lambda x: x.split(" ")[1] if x else None)
+# )
+git_status = []
 
 class CustomFormatter(logging.Formatter):
     green = "\x1b[32;32m"
@@ -186,12 +186,12 @@ async def create_request_logger(
         },
     )
     paths_inserted = []
-    try:
-        async with aiofiles.open("logs.txt", mode="r") as file:
-            content = await file.read()
-            paths_inserted.extend(content.split("\n"))
-    except Exception as e:
-        logger.warning("file don't exist", exc_info=e)
+    # try:
+    #     async with aiofiles.open("logs.txt", mode="r") as file:
+    #         content = await file.read()
+    #         paths_inserted.extend(content.split("\n"))
+    # except Exception as e:
+    #     logger.warning("file don't exist", exc_info=e)
 
     return RequestLogger(
         logger=logger,
