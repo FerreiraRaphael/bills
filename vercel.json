@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/run.py": {
-      "includeFiles": "api/**/*.py"
-    }
- }
-}
