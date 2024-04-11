@@ -68,7 +68,7 @@ DLogger = Annotated[RequestLogger, Depends(log)]
 DHttp = Annotated[RequestLogger, Depends(http)]
 router = APIRouter()
 
-@router.get("/")
+@router.get("/api")
 async def root(t: DTransaction, logger: DLogger):
     log = logger.getChild(__name__, __file__)
     try:
@@ -83,7 +83,7 @@ async def root(t: DTransaction, logger: DLogger):
         )
 
 
-@router.post("/add_bills")
+@router.post("/api/add_bills")
 async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
     log = logger.getChild(__name__, __file__)
     try:
@@ -98,7 +98,7 @@ async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
         )
 
 
-@router.get("/ping")
+@router.get("/api/ping")
 async def ping():
     return "pingg"
 
@@ -108,7 +108,7 @@ class LoggerInput(BaseModel):
     append = True
 
 
-@router.post("/logger", response_class=PlainTextResponse)
+@router.post("/api/logger", response_class=PlainTextResponse)
 async def post_logger(input: LoggerInput):
     # if input.append:
     lines = input.logs
@@ -122,13 +122,13 @@ async def post_logger(input: LoggerInput):
         return await file.read()
 
 
-@router.get("/logger", response_class=PlainTextResponse)
+@router.get("/api/logger", response_class=PlainTextResponse)
 async def get_logger():
     async with aiofiles.open("logs.txt", mode="r") as file:
         return await file.read()
 
 
-@router.get("/openapi.yaml", include_in_schema=False)
+@router.get("/api/openapi.yaml", include_in_schema=False)
 @functools.lru_cache
 def read_openapi_yaml() -> Response:
     openapi_json = app.openapi()
