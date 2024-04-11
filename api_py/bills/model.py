@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Union
 
 from pydantic import validator
 
@@ -26,14 +26,14 @@ class Bill(TableModel):
 
     @validator("created_at", "updated_at", "deleted_at", pre=True)
     @classmethod
-    def transform_datetime(cls, raw: str | datetime.datetime) -> datetime.datetime:
+    def transform_datetime(cls, raw: Union[str, datetime.datetime]) -> datetime.datetime:
         if isinstance(raw, str):
             return datetime.datetime.fromisoformat(raw)
         return raw
 
     @validator("tags", "main_tag", pre=True)
     @classmethod
-    def transform_tags(cls, raw: str | Tag | list[Tag] | None) -> Tag | list[Tag]:
+    def transform_tags(cls, raw: Union[str, Tag, list[Tag], None]) -> Union[Tag, list[Tag]]:
         if not raw or isinstance(raw, (Tag, list)):
             return raw
         value = json.loads(raw)

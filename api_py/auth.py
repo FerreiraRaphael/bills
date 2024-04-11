@@ -1,6 +1,6 @@
 from typing import Dict
 from typing_extensions import Annotated, Doc
-from typing import Any
+from typing import Any, Union
 from jwt.algorithms import RSAAlgorithm
 import jwt
 import aiohttp
@@ -12,7 +12,7 @@ from api_py.env import get_env
 CLERK_FRONTEND_API_URL = get_env("CLERK_FRONTEND_API_URL")
 
 class AuthenticationFailed(HTTPException):
-    def __init__(self, detail: Any = None, headers: Dict[str, str] | None = None) -> None:
+    def __init__(self, detail: Any = None, headers: Union[Dict[str, str], None] = None) -> None:
         super().__init__(status.HTTP_401_UNAUTHORIZED, detail, headers)
 
 def authenticate(request: Request):

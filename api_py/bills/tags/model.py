@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Union
 
 from pydantic import validator
 
@@ -18,7 +18,7 @@ class Tag(TableModel):
 
     @validator("created_at", "updated_at", "deleted_at", pre=True)
     @classmethod
-    def transform(cls, raw: str | datetime.datetime) -> datetime.datetime:
+    def transform(cls, raw: Union[str, datetime.datetime]) -> datetime.datetime:
         if isinstance(raw, str):
             return datetime.datetime.fromisoformat(raw)
         return raw
