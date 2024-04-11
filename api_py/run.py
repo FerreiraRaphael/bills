@@ -8,7 +8,7 @@ import aiofiles
 import aiohttp
 import yaml
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Request, Response, APIRouter
 from fastapi.responses import JSONResponse, PlainTextResponse
 from libsql_client import Transaction, create_client
 from pydantic import BaseModel
@@ -66,11 +66,9 @@ async def log(req: Request):
 DTransaction = Annotated[Transaction, Depends(t)]
 DLogger = Annotated[RequestLogger, Depends(log)]
 DHttp = Annotated[RequestLogger, Depends(http)]
+router = APIRouter()
 
-app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/")
+@router.get("/")
 async def root(t: DTransaction, logger: DLogger):
     log = logger.getChild(__name__, __file__)
     try:
@@ -85,7 +83,7 @@ async def root(t: DTransaction, logger: DLogger):
         )
 
 
-@app.post("/add_bills")
+@router.post("/add_bills")
 async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
     log = logger.getChild(__name__, __file__)
     try:
@@ -100,7 +98,7 @@ async def add_new_bill(t: DTransaction, logger: DLogger, bills: list[Bill]):
         )
 
 
-@app.get("/ping")
+@router.get("/ping")
 async def ping():
     return "pingg"
 
@@ -110,7 +108,7 @@ class LoggerInput(BaseModel):
     append = True
 
 
-@app.post("/logger", response_class=PlainTextResponse)
+@router.post("/logger", response_class=PlainTextResponse)
 async def post_logger(input: LoggerInput):
     # if input.append:
     lines = input.logs
@@ -124,13 +122,13 @@ async def post_logger(input: LoggerInput):
         return await file.read()
 
 
-@app.get("/logger", response_class=PlainTextResponse)
+@router.get("/logger", response_class=PlainTextResponse)
 async def get_logger():
     async with aiofiles.open("logs.txt", mode="r") as file:
         return await file.read()
 
 
-@app.get("/openapi.yaml", include_in_schema=False)
+@router.get("/openapi.yaml", include_in_schema=False)
 @functools.lru_cache
 def read_openapi_yaml() -> Response:
     openapi_json = app.openapi()
@@ -139,9 +137,23 @@ def read_openapi_yaml() -> Response:
     return Response(yaml_s.getvalue(), media_type="text/yaml")
 
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+# @router.exception_handler(Exception)
+# async def global_exception_handler(request: Request, exc: Exception):
+#     return JSONResponse(
+#         status_code=500,
+#         content={"message": (f"An unhandled exception occurred: {exc!r}.")},
+#     )
+
+
+def create_api():
+  app = FastAPI(lifespan=lifespan)
+  app.include_router(router)
+  @app.exception_handler(Exception)
+  async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={"message": (f"An unhandled exception occurred: {exc!r}.")},
     )
+
+
+  return app
