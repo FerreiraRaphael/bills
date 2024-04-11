@@ -4,5 +4,10 @@
       "runtime": "python@3.9",
       "includeFiles": "api_py/**/*.py"
     }
- }
+  },
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.py", "use": "@vercel/python" },
+    { "src": "*.js", "use": "@vercel/node" }
+  ]
 }
