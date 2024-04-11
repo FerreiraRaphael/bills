@@ -43,8 +43,8 @@ async def lifespan(app: FastAPI):
 
 
 async def t(req: Request):
+    transaction: Transaction = req.app.state.db.transaction()
     try:
-        transaction: Transaction = req.app.state.db.transaction()
         yield transaction
         if not transaction.closed:
             await transaction.commit()
