@@ -3,10 +3,5 @@
     "api/index.py": {
       "includeFiles": "api_py/**/*.py"
     }
-  },
-  "builds": [
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.py", "use": "@vercel/python" },
-    { "src": "*.js", "use": "@vercel/node" }
-  ]
+  }
 }
