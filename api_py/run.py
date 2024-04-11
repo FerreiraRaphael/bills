@@ -32,14 +32,18 @@ async def lifespan(app: FastAPI):
         get_env("DB_URL"),
         "Using Auth token db" if get_env("DB_AUTH") else "",
     )
-    async with create_client(
-        url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
-    ) as db:
-        print("To DB Connected.")
-        app.state.db = db
-        yield
-        print("Closing DB Connection.")
-        await db.close()
+    try:
+        async with create_client(
+            url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
+        ) as db:
+          print("To DB Connected.")
+          app.state.db = db
+          yield
+          print("Closing DB Connection.")
+          await db.close()
+    except Exception as e:
+        raise e
+
 
 
 async def t(req: Request):
