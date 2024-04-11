@@ -4,14 +4,14 @@ from decimal import Decimal
 
 from libsql_client import Transaction
 
-from api.bills._m.insert_bill import insert_bill
-from api.bills._m.update_bills import update_main_tag
-from api.bills.model import Bill
-from api.bills.tags._m.insert_bills_tags import insert_bills_tags
-from api.bills.tags._m.insert_tag import insert_tag
-from api.bills.tags._q.check_tag import check_tag
-from api.bills.tags.model import BillTag, Tag
-from api.logger import RequestLogger
+from api_py.bills._m.insert_bill import insert_bill
+from api_py.bills._m.update_bills import update_main_tag
+from api_py.bills.model import Bill
+from api_py.bills.tags._m.insert_bills_tags import insert_bills_tags
+from api_py.bills.tags._m.insert_tag import insert_tag
+from api_py.bills.tags._q.check_tag import check_tag
+from api_py.bills.tags.model import BillTag, Tag
+from api_py.logger import RequestLogger
 
 
 def treat_csv_row_data(row: dict):

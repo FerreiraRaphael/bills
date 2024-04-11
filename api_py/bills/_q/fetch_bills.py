@@ -5,10 +5,10 @@ from jinja2 import Environment, FileSystemLoader
 from libsql_client import Transaction
 from pydantic import BaseModel
 
-from api.bills.model import Bill
-from api.bills.tags.model import Tag
-from api.logger import RequestLogger
-from api.models import TableModel
+from api_py.bills.model import Bill
+from api_py.bills.tags.model import Tag
+from api_py.logger import RequestLogger
+from api_py.models import TableModel
 from packages.sql_eng import JinjaSql
 
 sql_path = os.path.join(os.path.dirname(__file__))

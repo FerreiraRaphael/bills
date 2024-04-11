@@ -4,8 +4,8 @@ from typing import Optional, Type, TypeVar
 
 from pydantic import validator
 
-from api.bills.tags.model import Tag
-from api.models import TableModel
+from api_py.bills.tags.model import Tag
+from api_py.models import TableModel
 
 T = TypeVar("T", bound="Bill")
 

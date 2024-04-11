@@ -4,9 +4,9 @@ import pytest_asyncio
 from dotenv import load_dotenv
 from libsql_client import Client
 
-from api.env import get_env
-from api.logger import create_logger, create_request_logger
-from api.run import create_client
+from api_py.env import get_env
+from api_py.logger import create_logger, create_request_logger
+from api_py.run import create_client
 
 load_dotenv(dotenv_path=".env.test", override=True)
 

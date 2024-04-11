@@ -7,7 +7,7 @@ import aiohttp
 from fastapi import Request, status
 from fastapi.exceptions import HTTPException
 
-from api.env import get_env
+from api_py.env import get_env
 
 CLERK_FRONTEND_API_URL = get_env("CLERK_FRONTEND_API_URL")
 

@@ -1,10 +1,10 @@
 import pytest_asyncio
 from libsql_client import Client, Transaction
 
-from api.bills.tags._m.insert_tag import insert_tag
-from api.bills.tags._q.check_tag import check_tag
-from api.bills.tags.model import Tag
-from api.logger import RequestLogger
+from api_py.bills.tags._m.insert_tag import insert_tag
+from api_py.bills.tags._q.check_tag import check_tag
+from api_py.bills.tags.model import Tag
+from api_py.logger import RequestLogger
 
 
 @pytest_asyncio.fixture(scope="module")

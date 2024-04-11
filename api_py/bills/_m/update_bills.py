@@ -1,7 +1,7 @@
 from libsql_client import Transaction
 from pydantic import BaseModel
 
-from api.logger import RequestLogger
+from api_py.logger import RequestLogger
 
 
 class UpdateBillsInput(BaseModel):

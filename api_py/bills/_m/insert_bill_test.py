@@ -1,9 +1,9 @@
 from libsql_client import Transaction
 
-from api.bills._m.insert_bill import insert_bill
-from api.bills._q.fetch_bills import fetch_bills
-from api.bills.model import Bill
-from api.logger import RequestLogger
+from api_py.bills._m.insert_bill import insert_bill
+from api_py.bills._q.fetch_bills import fetch_bills
+from api_py.bills.model import Bill
+from api_py.logger import RequestLogger
 
 date_sample = "2024-01-01T00:00:00Z"
 

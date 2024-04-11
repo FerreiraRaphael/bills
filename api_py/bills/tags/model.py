@@ -3,7 +3,7 @@ from typing import Optional, Type, TypeVar
 
 from pydantic import validator
 
-from api.models import TableModel
+from api_py.models import TableModel
 
 T = TypeVar("T", bound="Tag")
 

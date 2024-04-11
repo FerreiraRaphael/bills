@@ -3,9 +3,9 @@ from datetime import datetime
 import aiofiles
 from libsql_client import Transaction
 
-from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
-from api.bills.domain import create_new_bills_from_csv
-from api.logger import RequestLogger
+from api_py.bills._q.fetch_bills import FetchBillsParams, fetch_bills
+from api_py.bills.domain import create_new_bills_from_csv
+from api_py.logger import RequestLogger
 
 csv_path = "api/bills/domain_test.csv"
 

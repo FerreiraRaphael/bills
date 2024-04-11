@@ -1,6 +1,6 @@
 from libsql_client import Transaction
 
-from api.logger import RequestLogger
+from api_py.logger import RequestLogger
 
 
 async def check_tag(t: Transaction, logger: RequestLogger, name: str):

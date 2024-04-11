@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List, TypeVar
 
 from libsql_client import Transaction
 
-from api.models import TableModel
+from api_py.models import TableModel
 
 T = TypeVar("T", bound=TableModel)
 

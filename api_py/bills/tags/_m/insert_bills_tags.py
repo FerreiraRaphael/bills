@@ -1,8 +1,8 @@
 from libsql_client import Transaction
 
-from api._m.insert_data import insert_data
-from api.bills.tags.model import BillTag
-from api.logger import RequestLogger
+from api_py._m.insert_data import insert_data
+from api_py.bills.tags.model import BillTag
+from api_py.logger import RequestLogger
 
 
 def map_bills_tags(insert_bills_tags: BillTag):

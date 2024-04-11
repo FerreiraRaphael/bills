@@ -14,11 +14,11 @@ from libsql_client import Transaction, create_client
 from pydantic import BaseModel
 from pydash import uniq
 
-from api.bills._m.insert_bill import insert_bill
-from api.bills._q.fetch_bills import fetch_bills
-from api.bills.model import Bill
-from api.env import get_env
-from api.logger import RequestLogger, create_logger, create_request_logger
+from api_py.bills._m.insert_bill import insert_bill
+from api_py.bills._q.fetch_bills import fetch_bills
+from api_py.bills.model import Bill
+from api_py.env import get_env
+from api_py.logger import RequestLogger, create_logger, create_request_logger
 
 load_dotenv(override=True)
 

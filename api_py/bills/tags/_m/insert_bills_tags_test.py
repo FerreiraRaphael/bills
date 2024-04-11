@@ -1,12 +1,12 @@
 from libsql_client import Transaction
 
-from api.bills._m.insert_bill import insert_bill
-from api.bills._q.fetch_bills import FetchBillsParams, fetch_bills
-from api.bills.model import Bill
-from api.bills.tags._m.insert_bills_tags import insert_bills_tags
-from api.bills.tags._m.insert_tag import insert_tag
-from api.bills.tags.model import BillTag, Tag
-from api.logger import RequestLogger
+from api_py.bills._m.insert_bill import insert_bill
+from api_py.bills._q.fetch_bills import FetchBillsParams, fetch_bills
+from api_py.bills.model import Bill
+from api_py.bills.tags._m.insert_bills_tags import insert_bills_tags
+from api_py.bills.tags._m.insert_tag import insert_tag
+from api_py.bills.tags.model import BillTag, Tag
+from api_py.logger import RequestLogger
 
 
 async def test_insert_bills_tags(t: Transaction, log: RequestLogger):

@@ -1,9 +1,9 @@
 from libsql_client import Transaction
 from pydash import omit
 
-from api._m.insert_data import insert_data
-from api.bills.model import Bill
-from api.logger import RequestLogger
+from api_py._m.insert_data import insert_data
+from api_py.bills.model import Bill
+from api_py.logger import RequestLogger
 
 
 def map_bill(bill: Bill):
