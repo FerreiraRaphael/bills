@@ -22,6 +22,7 @@ async def test_insert_tag_multi(t: Transaction, log: RequestLogger):
     assert not await check_tag(t, log, "tag3")
     assert not await check_tag(t, log, "tag4")
 
+
 async def test_insert_tag_list(t: Transaction, log: RequestLogger):
     tag_list = [Tag(name="tag1"), Tag(name="tag2"), Tag(name="tag3")]
     await insert_tag(t, log, *tag_list)
