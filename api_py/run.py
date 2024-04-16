@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from libsql_client import Transaction, create_client
 from pydantic import BaseModel
 from pydash import uniq
-
+from libsql_client import Client
 from api_py.bills._m.insert_bill import insert_bill
 from api_py.bills._q.fetch_bills import fetch_bills
 from api_py.bills.model import Bill
@@ -64,12 +64,35 @@ async def create_db(app: FastAPI):
         print('error when trying to connect db', e)
         raise e
 
-async def t(req: Request):
-    print('Chegando na transaction, da erro aqui')
-    if not req.app.state.db:
-      print('Sem db criando um')
-      await create_db(req.app)
-    transaction: Transaction = req.app.state.db.transaction()
+async def db():
+    print('created db if not exists')
+    print(
+        "DB connecting.",
+        get_env("DB_URL"),
+        "Using Auth token db" if get_env("DB_AUTH") else "",
+    )
+    try:
+        async with create_client(
+            url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
+        ) as db:
+          print("To DB Connected.")
+          yield db
+    except Exception as e:
+        print('error when trying to connect db', e)
+        raise e
+    finally:
+      print('finally')
+      await db.close()
+      print('finally2')
+
+DB = Annotated[Client, Depends(db)]
+
+async def t(req: Request, db: DB):
+    # print('Chegando na transaction, da erro aqui')
+    # if req.app.state.db is None:
+    #   print('Sem db criando um')
+    #   await create_db(req.app)
+    transaction: Transaction = db.transaction()
     try:
         yield transaction
         if not transaction.closed:
@@ -87,10 +110,8 @@ async def http():
 
 async def log(req: Request):
     print('Criando o logger request')
-    if not req.app.state.logger:
-      print('Sem logger criando um')
-      req.app.state.logger = create_logger()
-    yield await create_request_logger(req.app.state.logger, req.url.path)
+    logger = create_logger()
+    yield await create_request_logger(logger, req.url.path)
 
 
 DTransaction = Annotated[Transaction, Depends(t)]
@@ -163,29 +184,25 @@ def create_api():
   app = FastAPI()
   app.include_router(router)
 
-  @app.on_event("startup")
-  async def startup_event():
-      print('No lifespan')
-      app.state.logger = create_logger()
+  # @app.on_event("startup")
+  # async def startup_event():
+  #     print('No lifespan')
+  #     app.state.logger = create_logger()
 
-      print(
-          "DB connecting.",
-          get_env("DB_URL"),
-          "Using Auth token db" if get_env("DB_AUTH") else "",
-      )
-      try:
-          async with create_client(
-              url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
-          ) as db:
-            print("To DB Connected.")
-            app.state.db = db
-      except Exception as e:
-          print('error when trying to connect db', e)
-          raise e
-  @app.on_event("shutdown")
-  async def shutdown_event():
-      print('Closing DB connection')
-      await app.state.db.close()
+  #     print(
+  #         "DB connecting.",
+  #         get_env("DB_URL"),
+  #         "Using Auth token db" if get_env("DB_AUTH") else "",
+  #     )
+  #     try:
+  #         async with create_client(
+  #             url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
+  #         ) as db:
+  #           print("To DB Connected.")
+  #           app.state.db = db
+  #     except Exception as e:
+  #         print('error when trying to connect db', e)
+  #         raise e
 
   @app.get("/api/openapi.yaml", include_in_schema=False)
   @functools.lru_cache
