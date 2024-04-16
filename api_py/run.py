@@ -88,10 +88,6 @@ async def db():
 DB = Annotated[Client, Depends(db)]
 
 async def t(req: Request, db: DB):
-    # print('Chegando na transaction, da erro aqui')
-    # if req.app.state.db is None:
-    #   print('Sem db criando um')
-    #   await create_db(req.app)
     transaction: Transaction = db.transaction()
     try:
         yield transaction

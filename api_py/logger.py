@@ -162,7 +162,7 @@ class RequestLogger:
 
 def create_logger():
     logger = logging.getLogger("API")
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
