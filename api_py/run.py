@@ -25,6 +25,7 @@ load_dotenv(override=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print('No lifespan')
     app.state.logger = create_logger()
 
     print(
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
 
 
 async def t(req: Request):
+    print('Chegando na transaction, da erro aqui')
     transaction: Transaction = req.app.state.db.transaction()
     try:
         yield transaction
@@ -64,6 +66,7 @@ async def http():
 
 
 async def log(req: Request):
+    print('Criando o logger request')
     yield await create_request_logger(req.app.state.logger, req.url.path)
 
 
@@ -133,6 +136,7 @@ async def get_logger():
 
 
 def create_api():
+  print('Criando o app')
   app = FastAPI(lifespan=lifespan)
   app.include_router(router)
 
