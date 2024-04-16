@@ -160,8 +160,32 @@ async def get_logger():
 
 def create_api():
   print('Criando o app')
-  app = FastAPI(lifespan=lifespan)
+  app = FastAPI()
   app.include_router(router)
+
+  @app.on_event("startup")
+  async def startup_event():
+      print('No lifespan')
+      app.state.logger = create_logger()
+
+      print(
+          "DB connecting.",
+          get_env("DB_URL"),
+          "Using Auth token db" if get_env("DB_AUTH") else "",
+      )
+      try:
+          async with create_client(
+              url=get_env("DB_URL"), auth_token=get_env("DB_AUTH")
+          ) as db:
+            print("To DB Connected.")
+            app.state.db = db
+      except Exception as e:
+          print('error when trying to connect db', e)
+          raise e
+  @app.on_event("shutdown")
+  async def shutdown_event():
+      print('Closing DB connection')
+      await app.state.db.close()
 
   @app.get("/api/openapi.yaml", include_in_schema=False)
   @functools.lru_cache
