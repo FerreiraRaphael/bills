@@ -3,5 +3,5 @@ from mangum import Mangum
 
 print('No index.py')
 app = create_api()
-handler = Mangum(app, lifespan="auto")
+handler = Mangum(app, lifespan="on")
 
