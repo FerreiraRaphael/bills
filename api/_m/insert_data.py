@@ -24,6 +24,8 @@ def treat_data(mapper: TMapper[T], *args: T):
 async def insert_data(
     t: Transaction, TableModel: T, mapper: TMapper[T], *args: T
 ) -> List[T]:
+    if len(args) == 0:
+        return []
     sql_columns, params_string, model_objects_values = treat_data(mapper, *args)
     sql = f"""
                 INSERT INTO {TableModel.__table_name__} ({", ".join(sql_columns)})

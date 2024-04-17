@@ -16,6 +16,7 @@ async def t(setup_client: Client, log: RequestLogger):
 
 
 async def test_check_tag(t: Transaction, log: RequestLogger):
+    print("antes do assert")
     assert await check_tag(t, log, "tag1")
     assert await check_tag(t, log, "tag2")
     assert not await check_tag(t, log, "tag3")
